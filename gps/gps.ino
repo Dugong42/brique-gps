@@ -49,10 +49,26 @@ void setup() {
 }
 
 void loop() {
-  // set the cursor to column 0, line 1
-  // (note: line 1 is the second row, since counting begins with 0):
-  lcd.setCursor(0, 1);
-  // print the number of seconds since reset:
-  lcd.print(millis()/1000);
+  // Lecture des pins multiplexés pour les boutons poussoirs
+  boolean bouton1 = digitalRead(15);
+  boolean bouton2 = digitalRead(16);
+  boolean bouton3 = digitalRead(17);
+  
+  // Fonctions des boutons poussoirs
+  if (!bouton1 && !bouton2 && bouton3) {
+    lcd.clear();
+    lcd.print("Premier");
+  } else if (!bouton1 && bouton2 && bouton3){
+    lcd.clear();
+    lcd.print("Deuxieme");
+  } else if (bouton1 && !bouton2 && bouton3) {
+    lcd.clear();
+    lcd.print("Troisieme");
+  } else if (bouton1 && bouton2 && bouton3) {
+    lcd.clear();
+    lcd.print("Quatrieme");
+  }
+
+  delay(100);
 }
 
