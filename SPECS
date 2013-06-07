@@ -1,4 +1,7 @@
 Description des fonctionnalités
+==============
+
+###Travail à réaliser
 
 Acquisition du signal GPS
 Enregistrer les données sur la carte SD
@@ -8,7 +11,7 @@ Exporter les points sur le PC
 Calcul de la distance parcourue/vol d'oiseau
 Calcul de la vitesse
 
-Fonctions des boutons / Use Case
+###Fonctions des boutons / Use Case
 
 Bouton 1 :
 Start/Stop/Reset
