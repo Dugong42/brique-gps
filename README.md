@@ -2,6 +2,6 @@ brique-gps
 ==========
 
 ### Participants
-Julien Nozais
+Julien "Dugong" Nozais
 Alexandre Horréard
 Youenn Piolet
