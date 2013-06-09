@@ -4,7 +4,7 @@
  * Copyright 2013
  *
  * Alexandre Horréard
- * Julien Nozais FTW
+ * Julien Nozais
  * Youenn Piolet
  */
 // -----------------------------------------------------
