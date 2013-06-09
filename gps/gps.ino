@@ -128,24 +128,15 @@ void loop() {
       do {
         int c = nss.read();
         // Si une trame est entièrement reçue
-<<<<<<< HEAD
         trame_recue = gps.encode(c);
-=======
-        boolean trame_recue = gps.encode(c);
->>>>>>> 5fedf1158c81cd1f90be132cb3b4f7891fafa1b3
         if (trame_recue){
           gps.get_position(&lat, &lon, &fix_age);
           // Temps en format hhmmsscc, date en format jjmmaa
           gps.get_datetime(&date, &time, &fix_age);
           // Vitesse en 100e de noeud -> m/s
           gspeed = gps.speed()*KNOT_CONV;
-<<<<<<< HEAD
         } 
       } while (nss.available() && !trame_recue && millis()-chrono<1000);
-=======
-        } while (nss.available() && !trame_recue && millis()-chrono<1000)
-      }
->>>>>>> 5fedf1158c81cd1f90be132cb3b4f7891fafa1b3
     }
   }
   
