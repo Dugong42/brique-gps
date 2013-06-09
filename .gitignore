@@ -1,5 +1,4 @@
 *.o
 *.hex
-.dep
-.lib
-main.ino
+*.dep
+*.lib
