@@ -12,9 +12,10 @@
 // -----------------------------------------------------
 
 #include <LiquidCrystal.h>
-#include "TinyGPS.h"
 #include <SoftwareSerial.h>
 #include <SD.h>
+#include "TinyGPS.h"
+#include "SDmgmt.h"
 
 // -----------------------------------------------------
 // Definition des constantes
@@ -40,7 +41,6 @@ boolean bouton1, bouton2, bouton3;
 char* nom_aff[5]={"Distance","Position","Vitesse","Batterie","Temps"};
 int affichage=0;
 const double KNOT_CONV = 0.514444444;
-File logGPS;
 
 // -----------------------------------------------------
 // Fonction d'initialisation
@@ -53,12 +53,15 @@ void setup() {
   // Print a message to the LCD.
   lcd.print("Init !");
   
-    // On the Ethernet Shield, CS is pin 4. It's set as an output by default.
+   // On the Ethernet Shield, CS is pin 4. It's set as an output by default.
   // Note that even if it's not used as the CS pin, the hardware SS pin 
   // (10 on most Arduino boards, 53 on the Mega) must be left as an output 
   // or the SD library functions will not work. 
    pinMode(10, OUTPUT);
-}
+   
+   if (!SD.begin(10)) {
+     lcd.print("Error File");
+  }
 
 // -----------------------------------------------------
 // Fonction répétée
@@ -143,7 +146,8 @@ void loop() {
           gps.get_datetime(&date, &time, &fix_age);
           // Vitesse en 100e de noeud -> m/s
           gspeed = gps.speed()*KNOT_CONV;
-        } 
+        }
+        writeCoordinates(lat, lon, date, time, gspeed);
       } while (nss.available() && !trame_recue && millis()-chrono<1000);
     }
   }
