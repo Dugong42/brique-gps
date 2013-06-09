@@ -31,8 +31,8 @@ const int RXPIN = 3;
 const int TXPIN = 2;
 
 // LCD Settings
-const int LCDCO = 16;
-const int LCDRO =  2;
+const int LCDCO = 8;
+const int LCDRO = 2;
 
 // Nautical mile per hour (knot) in meters per second (m/s)
 const double KNOT_CONV = 0.514444444;
@@ -55,6 +55,7 @@ void setup() {
 
     // Print a message to the LCD.
     lcd.print(MSG_INIT);
+    delay(1000);
 
     //voir exemple arduino SD pour la raison de cette ligne
     pinMode(10, OUTPUT);
@@ -62,6 +63,7 @@ void setup() {
     //Initialisation carte
     if (!SD.begin(10)) {
         lcd.print("Error File");
+        delay(1000);
     }
 }
 
