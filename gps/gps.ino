@@ -53,13 +53,11 @@ void setup() {
   // Print a message to the LCD.
   lcd.print("Init !");
   
-   // On the Ethernet Shield, CS is pin 4. It's set as an output by default.
-  // Note that even if it's not used as the CS pin, the hardware SS pin 
-  // (10 on most Arduino boards, 53 on the Mega) must be left as an output 
-  // or the SD library functions will not work. 
-   pinMode(10, OUTPUT);
+  //voir exemple arduino SD pour la raison de cette ligne
+  pinMode(10, OUTPUT);
    
-   if (!SD.begin(10)) {
+  //Initialisation carte
+  if (!SD.begin(10)) {
      lcd.print("Error File");
   }
 }
