@@ -120,14 +120,21 @@ void loop() {
   if (running){
     // Reception de la liaison serie vers l'objet GPS
     if (nss.available()){
-      int c = nss.read();
-      // Si une trame est entièrement reçue
-      if (gps.encode(c)){
-        gps.get_position(&lat, &lon, &fix_age);
-        // Temps en format hhmmsscc, date en format jjmmaa
-        gps.get_datetime(&date, &time, &fix_age);
-        // Vitesse en 100e de noeud -> m/s
-        gspeed = gps.speed()*KNOT_CONV;
+      // La structure do..while essaye de lire une trame complète pour 
+      // éviter de perdre des trames si on attendait trop longtemps de vider 
+      // le buffer série, et gère le blocage si la trame n'arrive jamais  
+      chrono = millis();
+      do {
+        int c = nss.read();
+        // Si une trame est entièrement reçue
+        boolean trame_recue = gps.encode(c);
+        if (trame_recue){
+          gps.get_position(&lat, &lon, &fix_age);
+          // Temps en format hhmmsscc, date en format jjmmaa
+          gps.get_datetime(&date, &time, &fix_age);
+          // Vitesse en 100e de noeud -> m/s
+          gspeed = gps.speed()*KNOT_CONV;
+        } while (nss.available() && !trame_recue && millis()-chrono<1000)
       }
     }
   }
