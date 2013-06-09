@@ -18,28 +18,28 @@
 #include "SDmgmt.h"
 
 // PINs
-const int BUT3  = 17
-const int BUT2  = 16
-const int BUT1  = 15
-const int LCD6  = 9
-const int LCD5  = 8
-const int LCD4  = 7
-const int LCD3  = 6
-const int LCD2  = 5
-const int LCD1  = 4
-const int RXPIN = 3
-const int TXPIN = 2
+const int BUT3  = 17;
+const int BUT2  = 16;
+const int BUT1  = 15;
+const int LCD6  = 9;
+const int LCD5  = 8;
+const int LCD4  = 7;
+const int LCD3  = 6;
+const int LCD2  = 5;
+const int LCD1  = 4;
+const int RXPIN = 3;
+const int TXPIN = 2;
 
 // LCD Settings
-const int LCDCO = 16
-const int LCDRO =  2
+const int LCDCO = 16;
+const int LCDRO =  2;
 
 // Nautical mile per hour (knot) in meters per second (m/s)
 const double KNOT_CONV = 0.514444444;
 
 // Printed text
 const char* MSG_MENUS[5]={"Distance", "Position", "Vitesse", "Batterie", "Temps"};
-const char MSG_INIT="GPS Ready."
+const char* MSG_INIT="GPS Ready.";
 
 // initialization of components with correct pins
 LiquidCrystal lcd(LCD1, LCD2, LCD3, LCD4, LCD5, LCD6);
