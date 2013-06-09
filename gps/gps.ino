@@ -41,15 +41,15 @@ const double KNOT_CONV = 0.514444444;
 const char* MSG_MENUS[5]={"Distance", "Position", "Vitesse", "Batterie", "Temps"};
 const char* MSG_INIT="GPS Ready.";
 
-// initialization of components with correct pins
+// Init external components
 LiquidCrystal lcd(LCD1, LCD2, LCD3, LCD4, LCD5, LCD6);
 SoftwareSerial nss(RXPIN, TXPIN);
 TinyGPS gps;
 
-// Global variables init
-
+// FUNCTION
 // Initialisation
 void setup() {
+
     // set up the LCD's number of columns and rows:
     lcd.begin(LCDCO, LCDRO);
 
@@ -65,6 +65,28 @@ void setup() {
         lcd.print("Error File");
         delay(1000);
     }
+}
+
+// FUNCTION
+// Button status management
+int demuxButtons() {
+    boolean buttons[3];
+    buttons[0] = digitalRead(BUT1);
+    buttons[1] = digitalRead(BUT2);
+    buttons[2] = digitalRead(BUT3);
+
+    int status=-1;
+    if (!buttons[0] && !buttons[1] && buttons[2])
+        status=1;
+    else if (!buttons[0] &&  buttons[1] && buttons[2])
+        status=2;
+    else if ( buttons[0] && !buttons[1] && buttons[2])
+        status=3;
+    else if ( buttons[0] &&  buttons[1] && buttons[2])
+        status=4;
+    else
+        status=0;
+    return status;
 }
 
 // This function will loop forever
