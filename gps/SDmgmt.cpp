@@ -31,7 +31,7 @@ int writeCoordinates (long lat, long lon, unsigned long date, unsigned long time
 
   if (logFile) {        
     sprintf(buffer, "%f:%f-- %f -- %f:%f", lat, lon, gspeed, date, time);
-    if (!logFile.prinln (buffer))
+    if (!logFile.println (buffer))
       return errWrite;
   }
   else
