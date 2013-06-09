@@ -34,6 +34,9 @@ const int TXPIN = 2;
 const int LCDCO = 8;
 const int LCDRO = 2;
 
+// Delay to press button to reset
+const int RSTDELAY = 2000;
+
 // Nautical mile per hour (knot) in meters per second (m/s)
 const double KNOT_CONV = 0.514444444;
 
@@ -68,7 +71,7 @@ void setup() {
 }
 
 // FUNCTION
-// Button status management
+// Button status detection
 int demuxButtons() {
     boolean buttons[3];
     buttons[0] = digitalRead(BUT1);
@@ -87,6 +90,40 @@ int demuxButtons() {
     else
         status=0;
     return status;
+}
+
+// FUNCTION
+// Button action management
+void hanleButtons() {
+    unsigned long timer;
+
+    switch (demuxButtons()) {
+        case 1:
+            // Chrono chrono;
+            timer=millis();
+            while (demuxButtons() == 1 && millis()-timer < RSTDELAY) {}
+
+            if (millis()-timer >= RSTDELAY) {
+                // chrono.reset();
+                lcd.clear();
+                lcd.print("Reset");
+            } else {
+                // chrono.trigger();
+                lcd.clear();
+                // chrono.isRunning() ? lcd.print("GPS Running") : lcd.print("GPS Paused");
+            }
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        case 4:
+            break;
+        case 0:
+            break;
+        default:
+            lcd.print("Invalid Button state");
+    }
 }
 
 // This function will loop forever
