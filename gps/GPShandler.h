@@ -14,7 +14,6 @@ class GPShandler {
         SoftwareSerial _nss;
         TinyGPS _gps;
 
-        void _refreshData();
 
     public:
         GPShandler();
@@ -26,4 +25,5 @@ class GPShandler {
         void run();
         void stop();
         void toggle();
+        void refreshData();
 };

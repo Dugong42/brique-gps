@@ -111,15 +111,15 @@ void printInfos() {
         case 1 :
             // Show Lat/Long
             lcd.clear();
-            // lcd.print(String(lat)); // Must use info object
+            lcd.print(String(gps.getLat())); // Must use info object
             lcd.setCursor(0,1);
-            // lcd.print(String(lon)); // Must use info object
+            lcd.print(String(gps.getLon())); // Must use info object
             break;
 
         case 2 :
             // Show Speed
             lcd.clear();
-            // lcd.print(String(gspeed)); // Must use info object
+            lcd.print(String(gps.getSpeed())); // Must use info object
             lcd.setCursor(0,1);
             lcd.print("m/s");
             break;
@@ -131,7 +131,7 @@ void printInfos() {
         case 4 :
             // Show Date
             lcd.clear();
-            // lcd.print(String(date)); // Must get info from object
+            lcd.print(String(gps.getDate())); // Must get info from object
             break;
 
         default :
@@ -200,8 +200,7 @@ void hanleButtons() {
 void loop() {
 
     hanleButtons();
-
-    // fix_age est le temps en ms depuis que la valeur a été encodée
+    gps.refreshData();
 
     // Delay between loops
     // Remember that there is an other delay after a button is pressed

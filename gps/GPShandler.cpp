@@ -40,7 +40,7 @@ void GPShandler::stop()   { _isRunning = false;       }
 void GPShandler::toggle() { _isRunning = !_isRunning; }
 
 // Information refreshing
-void GPShandler::_refreshData() {
+void GPShandler::refreshData() {
     unsigned long timer;
 
     if (_isRunning && _nss.available()) {
