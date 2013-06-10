@@ -11,12 +11,11 @@
 // include the library code:
 #include <Arduino.h>
 #include <LiquidCrystal.h>
-#include <SoftwareSerial.h>
 #include <SD.h>
 
-#include "TinyGPS.h"
 #include "SDmgmt.h"
 #include "Chrono.h"
+#include "GPShandler.h"
 
 // PINs
 const int BUT3  = 17;
@@ -47,9 +46,9 @@ const char* MSG_INIT="GPS Ready.";
 
 // Init external components
 LiquidCrystal lcd(LCD1, LCD2, LCD3, LCD4, LCD5, LCD6);
-SoftwareSerial nss(RXPIN, TXPIN);
-TinyGPS gps;
+GPShandler gps;
 Chrono chrono;
+int affichage;
 
 // FUNCTION
 // Initialisation
@@ -70,10 +69,16 @@ void setup() {
         lcd.print("Error File");
         delay(1000);
     }
+
+    affichage = 1;
 }
 
 // FUNCTION
-// Button status detection
+// Button status detection.
+//
+// Returns the pressed button ID,
+// Returns 0 when no or more than 1 button is pushed,
+// Returns -1 if something goes wrong
 int demuxButtons() {
     boolean buttons[3];
     buttons[0] = digitalRead(BUT1);
@@ -95,13 +100,59 @@ int demuxButtons() {
 }
 
 // FUNCTION
-// Button action management
+// Print various information
+// Latitude, Longitude, Date, Speed, etc.
+void printInfos() {
+    switch (affichage) {
+        case 0 :
+            // TODO
+            break;
+
+        case 1 :
+            // Show Lat/Long
+            lcd.clear();
+            // lcd.print(String(lat)); // Must use info object
+            lcd.setCursor(0,1);
+            // lcd.print(String(lon)); // Must use info object
+            break;
+
+        case 2 :
+            // Show Speed
+            lcd.clear();
+            // lcd.print(String(gspeed)); // Must use info object
+            lcd.setCursor(0,1);
+            lcd.print("m/s");
+            break;
+
+        case 3 :
+            // TODO
+            break;
+
+        case 4 :
+            // Show Date
+            lcd.clear();
+            // lcd.print(String(date)); // Must get info from object
+            break;
+
+        default :
+            // Error
+            lcd.clear();
+            lcd.print("Undef info");
+    }
+}
+
+// FUNCTION
+// Buttons behavior definition.
+// Executes a different action depending on the state of the buttons.
 void hanleButtons() {
     unsigned long timer;
 
     switch (demuxButtons()) {
         case 1:
+            // Start, Stop, Reset
             timer=millis();
+
+            // TODO: Make sure this line works and has the correct behavior
             while (demuxButtons() == 1 && millis()-timer < RSTDELAY) {;}
 
             if (millis()-timer >= RSTDELAY) {
@@ -114,15 +165,33 @@ void hanleButtons() {
                 chrono.isRunning() ? lcd.print("GPS Running") : lcd.print("GPS Paused");
             }
             break;
+
         case 2:
+            // Print various information
+            affichage = (affichage+1)%4;
+            lcd.clear();
+            lcd.print(MSG_MENUS[affichage]);
+            delay(250);
             break;
+
         case 3:
+            // TODO Changing recording mode
+            lcd.clear();
+            lcd.print("SCREEN NO 3");
             break;
+
         case 4:
+            // TODO PC Transfert
+            lcd.clear();
+            lcd.print("SCREEN NO 4");
             break;
+
         case 0:
+            // Nothing to do if nothing is pressed
             break;
+
         default:
+            // Error
             lcd.print("Invalid Button state");
     }
 }
@@ -130,126 +199,12 @@ void hanleButtons() {
 // This function will loop forever
 void loop() {
 
-    // Variables
-    boolean bouton1, bouton2, bouton3;
-    boolean running=false, reset=false;
-    unsigned long chrono;
-    int affichage=0;
-
-    // Lecture des pins multiplexés pour les boutons poussoirs
-    bouton1 = digitalRead(BUT1);
-    bouton2 = digitalRead(BUT2);
-    bouton3 = digitalRead(BUT3);
-
-    // -----------------------------------------------------
-    // Fonctions des boutons poussoirs
-    // -----------------------------------------------------
-
-    // Premier bouton : Start/Stop/Reset
-    if (!bouton1 && !bouton2 && bouton3) {
-
-        // Attente du reset
-        chrono = millis();
-        while (!bouton1 && !bouton2 && bouton3 && millis()-chrono < 2000){
-            bouton1 = digitalRead(15);
-            bouton2 = digitalRead(16);
-            bouton3 = digitalRead(17);
-        }
-
-        // Action en fonction du timer
-        if (millis()-chrono >= 2000) {
-            reset = true;
-            running = false;
-            lcd.clear();
-            lcd.print("Reset");
-        } else {
-            running = !running;
-            lcd.clear();
-            running ? lcd.print("Start") : lcd.print("Stop");
-        }
-
-        // Bouton 2 : Boucle sur des informations diverses
-    } else if (!bouton1 && bouton2 && bouton3){
-
-        affichage = (affichage+1)%4;
-        lcd.clear();
-        lcd.print(MSG_MENUS[affichage]);
-        delay(250);
-
-        // Bouton 3 : Changement de mode d'enregistrement
-    } else if (bouton1 && !bouton2 && bouton3) {
-        lcd.clear();
-        lcd.print("Troisieme");
-
-        // Bouton 4 : Transfert PC
-    } else if (bouton1 && bouton2 && bouton3) {
-        lcd.clear();
-        lcd.print("Quatrieme");
-    }
-
-    // -----------------------------------------------------
-    // Corps du code à réaliser en fonction du bouton pressé
-    // et / ou de l'état actuel
-    // -----------------------------------------------------
+    hanleButtons();
 
     // fix_age est le temps en ms depuis que la valeur a été encodée
-    long lat=0, lon=0;
-    unsigned long fix_age, time=0, date=0, gspeed=0;
-    boolean trame_recue=false;
 
-    if (running){
-        // Reception de la liaison serie vers l'objet GPS
-        if (nss.available()){
-            // La structure do..while essaye de lire une trame complète pour
-            // éviter de perdre des trames si on attendait trop longtemps de vider
-            // le buffer série, et gère le blocage si la trame n'arrive jamais
-            chrono = millis();
-            do {
-                int c = nss.read();
-                // Si une trame est entièrement reçue
-                trame_recue = gps.encode(c);
-                if (trame_recue){
-                    gps.get_position(&lat, &lon, &fix_age);
-                    // Temps en format hhmmsscc, date en format jjmmaa
-                    gps.get_datetime(&date, &time, &fix_age);
-                    // Vitesse en 100e de noeud -> m/s
-                    gspeed = gps.speed()*KNOT_CONV;
-                }
-                writeCoordinates(lat, lon, date, time, gspeed);
-            } while (nss.available() && !trame_recue && millis()-chrono<1000);
-        }
-    }
-
-    switch (affichage){
-        case 0 :
-            break;
-
-        case 1 :
-            lcd.clear();
-            lcd.print(String(lat));
-            lcd.setCursor(0,1);
-            lcd.print(String(lon));
-            break;
-
-        case 2 :
-            lcd.clear();
-            lcd.print(String(gspeed));
-            lcd.setCursor(0,1);
-            lcd.print("m/s");
-            break;
-
-        case 3 :
-            break;
-
-        case 4 :
-            lcd.clear();
-            lcd.print(String(date));
-            break;
-
-        default :
-            lcd.clear();
-            lcd.print("Ta chatte");
-    }
+    // Delay between loops
+    // Remember that there is an other delay after a button is pressed
     delay(100);
 }
 
