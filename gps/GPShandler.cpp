@@ -9,8 +9,11 @@ const double KNOT_CONV = 0.514444444;
 const int RXPIN = 3;
 const int TXPIN = 2;
 
+// GPS serial speed
+const int BAUDS = 4800;
+
 // Timeout for GPS trame reception
-const int TIMEOUT = 10000;
+const int TIMEOUT = 2000;
 
 // Constructor
 GPShandler::GPShandler() : _nss(SoftwareSerial(RXPIN, TXPIN)) {
@@ -22,6 +25,7 @@ GPShandler::GPShandler() : _nss(SoftwareSerial(RXPIN, TXPIN)) {
     _speed  =   0;
     _isRunning  = false;
     _isReceived = false;
+    _nss.begin(BAUDS);
 
     // Elapsed time in ms after value encoding
     _fixAge =   0;

@@ -159,7 +159,8 @@ void handleButtons() {
                 gps.stop();
                 lcd.clear();
                 lcd.print("Reset");
-                delay(250);
+                delay(1000);
+                while (demuxButtons() == 1) {;}
             } else {
                 gps.toggle();
                 lcd.clear();
