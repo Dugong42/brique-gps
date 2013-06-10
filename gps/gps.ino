@@ -205,9 +205,6 @@ void loop() {
     handleButtons();
     gps.refreshData();
     printInfos();
-
-    // Delay between loops
-    // Remember that there is an other delay after a button is pressed
-    delay(100);
+    
 }
 
