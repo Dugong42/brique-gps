@@ -16,6 +16,7 @@
 
 #include "TinyGPS.h"
 #include "SDmgmt.h"
+#include "Chrono.h"
 
 // PINs
 const int BUT3  = 17;
@@ -48,6 +49,7 @@ const char* MSG_INIT="GPS Ready.";
 LiquidCrystal lcd(LCD1, LCD2, LCD3, LCD4, LCD5, LCD6);
 SoftwareSerial nss(RXPIN, TXPIN);
 TinyGPS gps;
+Chrono chrono;
 
 // FUNCTION
 // Initialisation
@@ -99,18 +101,17 @@ void hanleButtons() {
 
     switch (demuxButtons()) {
         case 1:
-            // Chrono chrono;
             timer=millis();
-            while (demuxButtons() == 1 && millis()-timer < RSTDELAY) {}
+            while (demuxButtons() == 1 && millis()-timer < RSTDELAY) {;}
 
             if (millis()-timer >= RSTDELAY) {
-                // chrono.reset();
+                chrono.reset();
                 lcd.clear();
                 lcd.print("Reset");
             } else {
-                // chrono.trigger();
+                chrono.toggle();
                 lcd.clear();
-                // chrono.isRunning() ? lcd.print("GPS Running") : lcd.print("GPS Paused");
+                chrono.isRunning() ? lcd.print("GPS Running") : lcd.print("GPS Paused");
             }
             break;
         case 2:
