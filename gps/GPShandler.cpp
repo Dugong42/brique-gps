@@ -64,6 +64,6 @@ void GPShandler::refreshData() {
                 // Converting speed
                 _speed = _gps.speed() * KNOT_CONV;
             }
-        } while (_nss.available() && !_isRunning && millis()-timer < TIMEOUT);
+        } while (_nss.available() && !_isReceived && millis()-timer < TIMEOUT);
     }
 }
