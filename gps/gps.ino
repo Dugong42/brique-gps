@@ -12,10 +12,12 @@
 #include <Arduino.h>
 #include <LiquidCrystal.h>
 #include <SD.h>
+#include <SoftwareSerial.h>
 
 #include "SDmgmt.h"
 #include "Chrono.h"
 #include "GPShandler.h"
+#include "TinyGPS.h"
 
 // PINs
 const int BUT3  = 17;
