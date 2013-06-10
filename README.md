@@ -11,8 +11,8 @@ Youenn Piolet
 ### Copyright
 
 UTT
+2013
 
-IF23
 
 # Description des fonctionnalités
 
