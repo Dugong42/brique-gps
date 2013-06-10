@@ -26,4 +26,5 @@ class GPShandler {
         void stop();
         void toggle();
         void refreshData();
+        bool isRunning();
 };

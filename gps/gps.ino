@@ -15,7 +15,6 @@
 #include <SoftwareSerial.h>
 
 #include "SDmgmt.h"
-#include "Chrono.h"
 #include "GPShandler.h"
 #include "TinyGPS.h"
 
@@ -44,12 +43,11 @@ const double KNOT_CONV = 0.514444444;
 
 // Printed text
 const char* MSG_MENUS[5]={"Distance", "Position", "Vitesse", "Batterie", "Temps"};
-const char* MSG_INIT="GPS Ready.";
+const char* MSG_INIT="Ready";
 
 // Init external components
 LiquidCrystal lcd(LCD1, LCD2, LCD3, LCD4, LCD5, LCD6);
 GPShandler gps;
-Chrono chrono;
 int affichage;
 
 // FUNCTION
@@ -158,13 +156,15 @@ void handleButtons() {
             while (demuxButtons() == 1 && millis()-timer < RSTDELAY) {;}
 
             if (millis()-timer >= RSTDELAY) {
-                chrono.reset();
+                gps.stop();
                 lcd.clear();
                 lcd.print("Reset");
+                delay(250);
             } else {
-                chrono.toggle();
+                gps.toggle();
                 lcd.clear();
-                chrono.isRunning() ? lcd.print("GPS Running") : lcd.print("GPS Paused");
+                gps.isRunning() ? lcd.print("Running") : lcd.print("Paused");
+                delay(250);
             }
             break;
 
@@ -179,13 +179,13 @@ void handleButtons() {
         case 3:
             // TODO Changing recording mode
             lcd.clear();
-            lcd.print("SCREEN NO 3");
+            lcd.print("SCREEN 3");
             break;
 
         case 4:
             // TODO PC Transfert
             lcd.clear();
-            lcd.print("SCREEN NO 4");
+            lcd.print("SCREEN 4");
             break;
 
         case 0:

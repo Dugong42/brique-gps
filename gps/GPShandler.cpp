@@ -10,7 +10,7 @@ const int RXPIN = 3;
 const int TXPIN = 2;
 
 // Timeout for GPS trame reception
-const int TIMEOUT = 1000;
+const int TIMEOUT = 10000;
 
 // Constructor
 GPShandler::GPShandler() : _nss(SoftwareSerial(RXPIN, TXPIN)) {
@@ -33,6 +33,7 @@ long GPShandler::getLon() { return _lon; }
 unsigned long GPShandler::getTime()  { return _time; }
 unsigned long GPShandler::getDate()  { return _date; }
 unsigned long GPShandler::getSpeed() { return _speed; }
+bool GPShandler::isRunning() { return _isRunning; }
 
 // Status management
 void GPShandler::run()    { _isRunning = true;        }
