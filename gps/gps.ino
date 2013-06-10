@@ -12,10 +12,12 @@
 #include <Arduino.h>
 #include <LiquidCrystal.h>
 #include <SD.h>
+#include <SoftwareSerial.h>
 
 #include "SDmgmt.h"
 #include "Chrono.h"
 #include "GPShandler.h"
+#include "TinyGPS.h"
 
 // PINs
 const int BUT3  = 17;
@@ -144,7 +146,7 @@ void printInfos() {
 // FUNCTION
 // Buttons behavior definition.
 // Executes a different action depending on the state of the buttons.
-void hanleButtons() {
+void handleButtons() {
     unsigned long timer;
 
     switch (demuxButtons()) {
@@ -199,8 +201,9 @@ void hanleButtons() {
 // This function will loop forever
 void loop() {
 
-    hanleButtons();
+    handleButtons();
     gps.refreshData();
+    printInfos();
 
     // Delay between loops
     // Remember that there is an other delay after a button is pressed
