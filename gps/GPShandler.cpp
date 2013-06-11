@@ -1,4 +1,5 @@
 #include <SoftwareSerial.h>
+#include <LiquidCrystal.h>
 #include "GPShandler.h"
 #include "TinyGPS.h"
 
@@ -13,7 +14,7 @@ const int TXPIN = 2;
 const int BAUDS = 4800;
 
 // Timeout for GPS trame reception
-const int TIMEOUT = 700;
+const int TIMEOUT = 500;
 
 // Constructor
 GPShandler::GPShandler() : _nss(SoftwareSerial(RXPIN, TXPIN)) {
@@ -28,6 +29,7 @@ GPShandler::GPShandler() : _nss(SoftwareSerial(RXPIN, TXPIN)) {
     _chars = 0;
     _isRunning  = false;
     _isReceived = false;
+    _ticks = 0;
     _nss.begin(BAUDS);
 
     // Elapsed time in ms after value encoding
@@ -48,12 +50,13 @@ unsigned short GPShandler::getSentences() { return _sentences; }
 void GPShandler::run()    { _isRunning = true;        }
 void GPShandler::stop()   { _isRunning = false;       }
 void GPShandler::toggle() { _isRunning = !_isRunning; }
+void GPShandler::countTick() { _ticks++; }
 
 // Information refreshing
-void GPShandler::refreshData() {
+void GPShandler::refreshData(LiquidCrystal & lcd) {
     unsigned long timer;
 
-    if (_isRunning && _nss.available()) {
+    if (_isRunning && _nss.available() && _ticks%1000 == 0 ) {
         // Serial Link UP
 
         timer = millis();
@@ -70,13 +73,20 @@ void GPShandler::refreshData() {
                 // Time format: hhmmsscc
                 // Date format: jjmmaa
                 _gps.get_datetime(&_date, &_time, &_fixAge);
- 
+
                 // Converting speed
                 _speed = _gps.speed() * KNOT_CONV;
-                
+
                 // Stats : nb chars fed to the gps / nb sentences processed / nb failed checksum tests
                 _gps.stats(&_chars, &_sentences, &_failed_checksum);
             }
-        } while (_nss.available() && !_isReceived && millis()-timer < TIMEOUT);
+        } while (_nss.available() && !_isReceived && (millis()-timer < TIMEOUT));
+    }
+    else {
+        if (! _nss.available()) {
+            lcd.clear();
+            lcd.print("SerialErr");
+            delay(700);
+        }
     }
 }

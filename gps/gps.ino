@@ -38,6 +38,9 @@ const int LCDRO = 2;
 // Delay to press button to reset
 const int RSTDELAY = 2000;
 
+// Delay a notification message lasts
+const int PRINTDELAY = 800;
+
 // Nautical mile per hour (knot) in meters per second (m/s)
 const double KNOT_CONV = 0.514444444;
 
@@ -59,16 +62,16 @@ void setup() {
 
     // Print a message to the LCD.
     lcd.print(MSG_INIT);
-    delay(1000);
+    delay(PRINTDELAY);
 
     //voir exemple arduino SD pour la raison de cette ligne
     pinMode(10, OUTPUT);
 
     //Initialisation carte
-    if (!SD.begin(10)) {
-        lcd.print("Error File");
-        delay(1000);
-    }
+//    if (!SD.begin(10)) {
+//        lcd.print("Error File");
+//        delay(PRINTDELAY);
+//    }
 
     affichage = 1;
 }
@@ -106,7 +109,8 @@ int demuxButtons() {
 void lprint(String text) {
   int i;
   lcd.print(text);
-  for (i = text.length() ; i < 8 ; i++) { lcd.print(" "); }
+  for (i = text.length() ; i < 8 ; i++)
+      lcd.print(" ");
 }
 
 // FUNCTION
@@ -115,11 +119,13 @@ void lprint(String text) {
 void printInfos() {
     switch (affichage) {
         case 0 :
-            // TODO : distance
+            // Distance
             lcd.home();
-            lprint("?? m");
+            lprint("?????? m");
             lcd.setCursor(0,1);
-            lprint("?? m");
+
+            // TODO: why 2 lines with the same info?
+            lprint("?????? m");
             break;
 
         case 1 :
@@ -135,7 +141,7 @@ void printInfos() {
             lcd.home();
             lprint(String(gps.getSpeed())); // Must use info object
             lcd.setCursor(0,1);
-            lprint(String("m/s"));
+            lprint(String("???? m/s"));
             break;
 
         case 3 :
@@ -155,7 +161,9 @@ void printInfos() {
         default :
             // Error
             lcd.clear();
-            lprint(String("Undef info"));
+            lprint(String("Undef"));
+            lcd.setCursor(0,1);
+            lprint(String("info"));
     }
 }
 
@@ -177,13 +185,13 @@ void handleButtons() {
                 gps.stop();
                 lcd.clear();
                 lcd.print("Reset");
-                delay(1000);
+                delay(PRINTDELAY);
                 while (demuxButtons() == 1) {;}
             } else {
-                gps.toggle();
                 lcd.clear();
                 gps.isRunning() ? lcd.print("Running") : lcd.print("Paused");
-                delay(250);
+                delay(PRINTDELAY);
+                gps.toggle();
             }
             break;
 
@@ -192,25 +200,27 @@ void handleButtons() {
             affichage = (affichage+1)%4;
             lcd.clear();
             lcd.print(MSG_MENUS[affichage]);
-            delay(250);
+            delay(PRINTDELAY);
             break;
 
         case 3:
             // TODO Changing recording mode
             lcd.clear();
             lcd.print("SCREEN 3");
-            delay(250);
+            delay(PRINTDELAY);
             break;
 
         case 4:
             // TODO PC Transfert
             lcd.clear();
             lcd.print("SCREEN 4");
-            delay(250);
+            delay(PRINTDELAY);
             break;
 
         case 0:
             // Nothing to do if nothing is pressed
+            gps.countTick();
+            gps.refreshData(lcd);
             break;
 
         default:
@@ -223,9 +233,7 @@ void handleButtons() {
 void loop() {
 
     handleButtons();
-    gps.refreshData();
     printInfos();
-    //delay(20);
-    
+
 }
 
