@@ -49,6 +49,7 @@ const char* MSG_INIT="Ready";
 LiquidCrystal lcd(LCD1, LCD2, LCD3, LCD4, LCD5, LCD6);
 GPShandler gps;
 int affichage;
+SDmgmt sdCard;
 
 // FUNCTION
 // Initialisation
@@ -163,6 +164,8 @@ void handleButtons() {
                 gps.stop();
                 lcd.clear();
                 lcd.print("Reset");
+                //The file on the SD is closed and another one is oponed when the system reset
+                sdCard.changeFile();
                 delay(1000);
                 while (demuxButtons() == 1) {;}
             } else {
@@ -209,7 +212,9 @@ void loop() {
     handleButtons();
     gps.refreshData();
     printInfos();
+    //Assuming we write everything, data is logged here
+    //TODO Do we write everything ? If no, what do we check ?
+    sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(), gps.getTime(), gps.getSpeed());
     delay(100);
-    
 }
 

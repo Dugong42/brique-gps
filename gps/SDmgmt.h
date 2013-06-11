@@ -11,11 +11,12 @@ class SDmgmt {
   private : 
     char _nameFile[BUFFER_SIZE];
     int _numFile;
+    File _logFile;
     
   public :
     SDmgmt();
     int writeCoordinates (long lat, long lon, unsigned long date, unsigned long time, unsigned long gspeed);
-    void changeFileName(); 
+    void changeFile(); 
 };
 
 #endif

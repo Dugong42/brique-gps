@@ -13,6 +13,7 @@
 SDmgmt::SDmgmt(){
   strcpy(_nameFile, "gpslog00.txt");
   _numFile = 00;
+  _logFile = SD.open(_nameFile, FILE_WRITE);
 }
 
 
@@ -34,26 +35,28 @@ int SDmgmt::writeCoordinates (long lat, long lon, unsigned long date,
 {
     int n;
     char buffer[100];
-    File logFile = SD.open(_nameFile, FILE_WRITE);
 
-    if (logFile) {
+    if (_logFile) {
         sprintf(buffer, "%f:%f-- %f -- %f:%f", lat, lon, gspeed, date, time);
-        if (!logFile.println (buffer))
+        if (!_logFile.println (buffer))
             return errWrite;
     }
     else
         return errOpenFile;
-
-    logFile.close();
+    
+    _logFile.flush();
 }
 
 /**
 *@fn void SDmgmt::changeFileName()
 *@brief Increment the name of the file and create it
 */
-void SDmgmt::changeFileName() {
+void SDmgmt::changeFile() {
   
   _numFile = _numFile + 1;
   sprintf (_nameFile ,"gpslog%d.txt", _numFile);
+  _logFile.close();
+  _logFile = SD.open(_nameFile, FILE_WRITE);
+
 }
 
