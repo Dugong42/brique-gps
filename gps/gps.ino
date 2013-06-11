@@ -98,6 +98,16 @@ int demuxButtons() {
         status=0;
     return status;
 }
+// FUNCTION
+// Displays a line without flickering
+// Implies the use of lcd.home() instead of lcd.clear()
+//
+// @text text to print to the lcd device
+void lprint(String text) {
+  int i;
+  lcd.print(text);
+  for (i = text.length() ; i < 8 ; i++) { lcd.print(" "); }
+}
 
 // FUNCTION
 // Print various information
@@ -105,43 +115,47 @@ int demuxButtons() {
 void printInfos() {
     switch (affichage) {
         case 0 :
-            // TODO
+            // TODO : distance
+            lcd.home();
+            lprint("?? m");
+            lcd.setCursor(0,1);
+            lprint("?? m");
             break;
 
         case 1 :
             // Show Lat/Long
-            lcd.clear();
-            lcd.print(String(gps.getLat())); // Must use info object
+            lcd.home();
+            lprint(String(gps.getLat()));
             lcd.setCursor(0,1);
-            lcd.print(String(gps.getLon())); // Must use info object
+            lprint(String(gps.getLon()));
             break;
 
         case 2 :
             // Show Speed
-            lcd.clear();
-            lcd.print(String(gps.getSpeed())); // Must use info object
+            lcd.home();
+            lprint(String(gps.getSpeed())); // Must use info object
             lcd.setCursor(0,1);
-            lcd.print("m/s");
+            lprint(String("m/s"));
             break;
 
         case 3 :
             // TODO
-            lcd.clear();
-            lcd.print(String(gps.getFailed()));
+            lcd.home();
+            lprint(String(gps.getFailed()));
             lcd.setCursor(0,1);
-            lcd.print(String(gps.getSentences()));
+            lprint(String(gps.getSentences()));
             break;
 
         case 4 :
             // Show Date
             lcd.clear();
-            lcd.print(String(gps.getDate())); // Must get info from object
+            lprint(String(gps.getDate())); // Must get info from object
             break;
 
         default :
             // Error
             lcd.clear();
-            lcd.print("Undef info");
+            lprint(String("Undef info"));
     }
 }
 
@@ -185,12 +199,14 @@ void handleButtons() {
             // TODO Changing recording mode
             lcd.clear();
             lcd.print("SCREEN 3");
+            delay(250);
             break;
 
         case 4:
             // TODO PC Transfert
             lcd.clear();
             lcd.print("SCREEN 4");
+            delay(250);
             break;
 
         case 0:
@@ -209,7 +225,7 @@ void loop() {
     handleButtons();
     gps.refreshData();
     printInfos();
-    delay(100);
+    delay(20);
     
 }
 

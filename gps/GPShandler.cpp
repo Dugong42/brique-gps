@@ -13,7 +13,7 @@ const int TXPIN = 2;
 const int BAUDS = 4800;
 
 // Timeout for GPS trame reception
-const int TIMEOUT = 500;
+const int TIMEOUT = 700;
 
 // Constructor
 GPShandler::GPShandler() : _nss(SoftwareSerial(RXPIN, TXPIN)) {
