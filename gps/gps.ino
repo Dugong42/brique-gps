@@ -225,7 +225,7 @@ void loop() {
     handleButtons();
     gps.refreshData();
     printInfos();
-    delay(20);
+    //delay(20);
     
 }
 
