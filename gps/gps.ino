@@ -38,6 +38,9 @@ const int LCDRO = 2;
 // Delay to press button to reset
 const int RSTDELAY = 2000;
 
+// Delay a notification message lasts
+const int PRINTDELAY = 800;
+
 // Nautical mile per hour (knot) in meters per second (m/s)
 const double KNOT_CONV = 0.514444444;
 
@@ -60,16 +63,16 @@ void setup() {
 
     // Print a message to the LCD.
     lcd.print(MSG_INIT);
-    delay(1000);
+    delay(PRINTDELAY);
 
     //voir exemple arduino SD pour la raison de cette ligne
     pinMode(10, OUTPUT);
 
     //Initialisation carte
-    if (!SD.begin(10)) {
-        lcd.print("Error initialisation SD");
-        delay(1000);
-    }
+//    if (!SD.begin(10)) {
+//        lcd.print("Error initialisation SD");
+//        delay(PRINTDELAY);
+//    }
 
     affichage = 1;
 }
@@ -99,6 +102,17 @@ int demuxButtons() {
         status=0;
     return status;
 }
+// FUNCTION
+// Displays a line without flickering
+// Implies the use of lcd.home() instead of lcd.clear()
+//
+// @text text to print to the lcd device
+void lprint(String text) {
+  int i;
+  lcd.print(text);
+  for (i = text.length() ; i < 8 ; i++)
+      lcd.print(" ");
+}
 
 // FUNCTION
 // Print various information
@@ -106,43 +120,51 @@ int demuxButtons() {
 void printInfos() {
     switch (affichage) {
         case 0 :
-            // TODO
+            // Distance
+            lcd.home();
+            lprint("?????? m");
+            lcd.setCursor(0,1);
+
+            // TODO: why 2 lines with the same info?
+            lprint("?????? m");
             break;
 
         case 1 :
             // Show Lat/Long
-            lcd.clear();
-            lcd.print(String(gps.getLat())); // Must use info object
+            lcd.home();
+            lprint(String(gps.getLat()));
             lcd.setCursor(0,1);
-            lcd.print(String(gps.getLon())); // Must use info object
+            lprint(String(gps.getLon()));
             break;
 
         case 2 :
             // Show Speed
-            lcd.clear();
-            lcd.print(String(gps.getSpeed())); // Must use info object
+            lcd.home();
+            lprint(String(gps.getSpeed())); // Must use info object
             lcd.setCursor(0,1);
-            lcd.print("m/s");
+            lprint(String("???? m/s"));
             break;
 
         case 3 :
             // TODO
-            lcd.clear();
-            lcd.print(String(gps.getFailed()));
+            lcd.home();
+            lprint(String(gps.getFailed()));
             lcd.setCursor(0,1);
-            lcd.print(String(gps.getSentences()));
+            lprint(String(gps.getSentences()));
             break;
 
         case 4 :
             // Show Date
             lcd.clear();
-            lcd.print(String(gps.getDate())); // Must get info from object
+            lprint(String(gps.getDate())); // Must get info from object
             break;
 
         default :
             // Error
             lcd.clear();
-            lcd.print("Undef info");
+            lprint(String("Undef"));
+            lcd.setCursor(0,1);
+            lprint(String("info"));
     }
 }
 
@@ -164,15 +186,17 @@ void handleButtons() {
                 gps.stop();
                 lcd.clear();
                 lcd.print("Reset");
+                
                 //The file on the SD is closed and another one is oponed when the system reset
                 sdCard.changeFile();
-                delay(1000);
+                delay(PRINTDELAY);
+
                 while (demuxButtons() == 1) {;}
             } else {
-                gps.toggle();
                 lcd.clear();
                 gps.isRunning() ? lcd.print("Running") : lcd.print("Paused");
-                delay(250);
+                delay(PRINTDELAY);
+                gps.toggle();
             }
             break;
 
@@ -181,23 +205,27 @@ void handleButtons() {
             affichage = (affichage+1)%4;
             lcd.clear();
             lcd.print(MSG_MENUS[affichage]);
-            delay(250);
+            delay(PRINTDELAY);
             break;
 
         case 3:
             // TODO Changing recording mode
             lcd.clear();
             lcd.print("SCREEN 3");
+            delay(PRINTDELAY);
             break;
 
         case 4:
             // TODO PC Transfert
             lcd.clear();
             lcd.print("SCREEN 4");
+            delay(PRINTDELAY);
             break;
 
         case 0:
             // Nothing to do if nothing is pressed
+            gps.countTick();
+            gps.refreshData(lcd);
             break;
 
         default:
@@ -210,11 +238,11 @@ void handleButtons() {
 void loop() {
 
     handleButtons();
-    gps.refreshData();
     printInfos();
     //Assuming we write everything, data is logged here
     //TODO Do we write everything ? If no, what do we check ?
     sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(), gps.getTime(), gps.getSpeed());
     delay(100);
+
 }
 

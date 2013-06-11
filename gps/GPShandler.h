@@ -1,5 +1,6 @@
 #include <SoftwareSerial.h>
 #include "TinyGPS.h"
+#include <LiquidCrystal.h>
 
 class GPShandler {
     private:
@@ -14,9 +15,9 @@ class GPShandler {
         unsigned short _sentences;
         bool _isReceived;
         bool _isRunning;
+        int _ticks;
         SoftwareSerial _nss;
         TinyGPS _gps;
-
 
     public:
         GPShandler();
@@ -30,6 +31,7 @@ class GPShandler {
         void run();
         void stop();
         void toggle();
-        void refreshData();
+        void refreshData(LiquidCrystal &);
         bool isRunning();
+        void countTick();
 };

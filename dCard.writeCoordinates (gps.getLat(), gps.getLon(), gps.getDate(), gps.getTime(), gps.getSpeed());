@@ -1,0 +1,61 @@
+[1mdiff --cc gps/gps.ino[m
+[1mindex c6c4229,578cc68..0000000[m
+[1m--- a/gps/gps.ino[m
+[1m+++ b/gps/gps.ino[m
+[36m@@@ -66,10 -68,10 +69,17 @@@[m [mvoid setup() [m
+      pinMode(10, OUTPUT);[m
+  [m
+      //Initialisation carte[m
+[32m++<<<<<<< HEAD[m
+[32m +    if (!SD.begin(10)) {[m
+[32m +        lcd.print("Error initialisation SD");[m
+[32m +        delay(1000);[m
+[32m +    }[m
+[32m++=======[m
+[32m+ //    if (!SD.begin(10)) {[m
+[32m+ //        lcd.print("Error File");[m
+[32m+ //        delay(PRINTDELAY);[m
+[32m+ //    }[m
+[32m++>>>>>>> 58504224b7a8f976cb9458d16ceda053de0f6f7f[m
+  [m
+      affichage = 1;[m
+  }[m
+[36m@@@ -164,15 -185,13 +193,19 @@@[m [mvoid handleButtons() [m
+                  gps.stop();[m
+                  lcd.clear();[m
+                  lcd.print("Reset");[m
+[32m++<<<<<<< HEAD[m
+[32m +                //The file on the SD is closed and another one is oponed when the system reset[m
+[32m +                sdCard.changeFile();[m
+[32m +                delay(1000);[m
+[32m++=======[m
+[32m+                 delay(PRINTDELAY);[m
+[32m++>>>>>>> 58504224b7a8f976cb9458d16ceda053de0f6f7f[m
+                  while (demuxButtons() == 1) {;}[m
+              } else {[m
+[31m-                 gps.toggle();[m
+                  lcd.clear();[m
+                  gps.isRunning() ? lcd.print("Running") : lcd.print("Paused");[m
+[31m-                 delay(250);[m
+[32m+                 delay(PRINTDELAY);[m
+[32m+                 gps.toggle();[m
+              }[m
+              break;[m
+  [m
+[36m@@@ -210,11 -233,7 +247,14 @@@[m
+  void loop() {[m
+  [m
+      handleButtons();[m
+[31m-     gps.refreshData();[m
+      printInfos();[m
+[31m -[m
+[32m++<<<<<<< HEAD[m
+[32m +    //Assuming we write everything, data is logged here[m
+[32m +    //TODO Do we write everything ? If no, what do we check ?[m
+[32m +    sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(), gps.getTime(), gps.getSpeed());[m
+[32m +    delay(100);[m
+[32m++=======[m
+[32m++[m
+[32m++>>>>>>> 58504224b7a8f976cb9458d16ceda053de0f6f7f[m
+  }[m
+  [m
