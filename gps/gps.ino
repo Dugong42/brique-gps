@@ -66,7 +66,7 @@ void setup() {
 
     //Initialisation carte
     if (!SD.begin(10)) {
-        lcd.print("Error File");
+        lcd.print("Error initialisation SD");
         delay(1000);
     }
 

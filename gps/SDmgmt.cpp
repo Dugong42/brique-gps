@@ -7,9 +7,14 @@
 #include <SD.h>
 #include "SDmgmt.h"
 
-// Définition des codes d'erreur
-#define errOpenFile  -1
-#define errWrite     -2
+
+
+//Constructor
+SDmgmt::SDmgmt(){
+  strcpy(_nameFile, "gpslog00.txt");
+  _numFile = 00;
+}
+
 
 /**
  *\fn int writeCoordinates (long lat, long lon, long date, long time)
@@ -24,12 +29,12 @@
  *	   -1 si ne peut pas ouvrir le fichier
  *	   -2 si erreur ecriture
  */
-int writeCoordinates (long lat, long lon, unsigned long date,
+int SDmgmt::writeCoordinates (long lat, long lon, unsigned long date,
         unsigned long time, unsigned long gspeed)
 {
     int n;
     char buffer[100];
-    File logFile = SD.open("coordinates.txt", FILE_WRITE);
+    File logFile = SD.open(_nameFile, FILE_WRITE);
 
     if (logFile) {
         sprintf(buffer, "%f:%f-- %f -- %f:%f", lat, lon, gspeed, date, time);
@@ -41,3 +46,14 @@ int writeCoordinates (long lat, long lon, unsigned long date,
 
     logFile.close();
 }
+
+/**
+*@fn void SDmgmt::changeFileName()
+*@brief Increment the name of the file and create it
+*/
+void SDmgmt::changeFileName() {
+  
+  _numFile = _numFile + 1;
+  sprintf (_nameFile ,"gpslog%d.txt", _numFile);
+}
+
