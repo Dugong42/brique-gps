@@ -9,6 +9,9 @@ class GPShandler {
         unsigned long _date;
         unsigned long _speed;
         unsigned long _fixAge;
+        unsigned long _chars;
+        unsigned short _failed_checksum;
+        unsigned short _sentences;
         bool _isReceived;
         bool _isRunning;
         SoftwareSerial _nss;
@@ -22,6 +25,8 @@ class GPShandler {
         unsigned long getTime();
         unsigned long getDate();
         unsigned long getSpeed();
+        unsigned short getSentences();
+        unsigned short getFailed();
         void run();
         void stop();
         void toggle();

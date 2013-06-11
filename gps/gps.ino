@@ -42,7 +42,7 @@ const int RSTDELAY = 2000;
 const double KNOT_CONV = 0.514444444;
 
 // Printed text
-const char* MSG_MENUS[5]={"Distance", "Position", "Vitesse", "Batterie", "Temps"};
+const char* MSG_MENUS[5]={"Distance", "Position", "Vitesse", "Stats", "Temps"};
 const char* MSG_INIT="Ready";
 
 // Init external components
@@ -126,6 +126,10 @@ void printInfos() {
 
         case 3 :
             // TODO
+            lcd.clear();
+            lcd.print(String(gps.getFailed()));
+            lcd.setCursor(0,1);
+            lcd.print(String(gps.getSentences()));
             break;
 
         case 4 :
@@ -205,6 +209,7 @@ void loop() {
     handleButtons();
     gps.refreshData();
     printInfos();
+    delay(100);
     
 }
 

@@ -13,7 +13,7 @@ const int TXPIN = 2;
 const int BAUDS = 4800;
 
 // Timeout for GPS trame reception
-const int TIMEOUT = 2000;
+const int TIMEOUT = 500;
 
 // Constructor
 GPShandler::GPShandler() : _nss(SoftwareSerial(RXPIN, TXPIN)) {
@@ -23,6 +23,9 @@ GPShandler::GPShandler() : _nss(SoftwareSerial(RXPIN, TXPIN)) {
     _time   =   0;
     _date   =   0;
     _speed  =   0;
+    _failed_checksum = 0;
+    _sentences = 0;
+    _chars = 0;
     _isRunning  = false;
     _isReceived = false;
     _nss.begin(BAUDS);
@@ -38,6 +41,8 @@ unsigned long GPShandler::getTime()  { return _time; }
 unsigned long GPShandler::getDate()  { return _date; }
 unsigned long GPShandler::getSpeed() { return _speed; }
 bool GPShandler::isRunning() { return _isRunning; }
+unsigned short GPShandler::getFailed() { return _failed_checksum; }
+unsigned short GPShandler::getSentences() { return _sentences; }
 
 // Status management
 void GPShandler::run()    { _isRunning = true;        }
@@ -65,9 +70,12 @@ void GPShandler::refreshData() {
                 // Time format: hhmmsscc
                 // Date format: jjmmaa
                 _gps.get_datetime(&_date, &_time, &_fixAge);
-
+ 
                 // Converting speed
                 _speed = _gps.speed() * KNOT_CONV;
+                
+                // Stats : nb chars fed to the gps / nb sentences processed / nb failed checksum tests
+                _gps.stats(&_chars, &_sentences, &_failed_checksum);
             }
         } while (_nss.available() && !_isReceived && millis()-timer < TIMEOUT);
     }
