@@ -14,7 +14,7 @@ const int TXPIN = 2;
 const int BAUDS = 4800;
 
 // Timeout for GPS trame reception
-const int TIMEOUT = 500;
+const int TIMEOUT = 700;
 
 // Constructor
 GPShandler::GPShandler() : _nss(SoftwareSerial(RXPIN, TXPIN)) {
@@ -45,6 +45,7 @@ unsigned long GPShandler::getSpeed() { return _speed; }
 bool GPShandler::isRunning() { return _isRunning; }
 unsigned short GPShandler::getFailed() { return _failed_checksum; }
 unsigned short GPShandler::getSentences() { return _sentences; }
+unsigned long GPShandler::getChars() { return _chars; }
 
 // Status management
 void GPShandler::run()    { _isRunning = true;        }
@@ -53,12 +54,12 @@ void GPShandler::toggle() { _isRunning = !_isRunning; }
 void GPShandler::countTick() { _ticks++; }
 
 // Information refreshing
-void GPShandler::refreshData(LiquidCrystal & lcd) {
+void GPShandler::refreshData(/*LiquidCrystal & lcd*/) {
     unsigned long timer;
 
-    if (_isRunning && _nss.available() && _ticks%1000 == 0 ) {
+    if (_isRunning && _nss.available() /*&& _ticks%10 == 0*/ ) {
         // Serial Link UP
-
+        
         timer = millis();
         do {
             // We try to read a full message, handling transmission timeout in
@@ -81,12 +82,12 @@ void GPShandler::refreshData(LiquidCrystal & lcd) {
                 _gps.stats(&_chars, &_sentences, &_failed_checksum);
             }
         } while (_nss.available() && !_isReceived && (millis()-timer < TIMEOUT));
-    }
+    }/*
     else {
         if (! _nss.available()) {
             lcd.clear();
             lcd.print("SerialErr");
             delay(700);
         }
-    }
+    }*/
 }

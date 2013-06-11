@@ -28,10 +28,11 @@ class GPShandler {
         unsigned long getSpeed();
         unsigned short getSentences();
         unsigned short getFailed();
+        unsigned long getChars();
         void run();
         void stop();
         void toggle();
-        void refreshData(LiquidCrystal &);
+        void refreshData(/*LiquidCrystal &*/);
         bool isRunning();
         void countTick();
 };
