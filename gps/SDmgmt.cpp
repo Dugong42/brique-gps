@@ -8,12 +8,12 @@
 #include "SDmgmt.h"
 
 
-
 //Constructor
 SDmgmt::SDmgmt(){
   strcpy(_nameFile, "gpslog00.txt");
   _numFile = 00;
   _logFile = SD.open(_nameFile, FILE_WRITE);
+  _timerSD=millis();
 }
 
 
@@ -33,17 +33,19 @@ SDmgmt::SDmgmt(){
 int SDmgmt::writeCoordinates (long lat, long lon, unsigned long date,
         unsigned long time, unsigned long gspeed)
 {
-    int n;
-    char buffer[100];
-
-    if (_logFile) {
-        sprintf(buffer, "%f:%f-- %f -- %f:%f", lat, lon, gspeed, date, time);
-        if (!_logFile.println (buffer))
-            return errWrite;
-    }
-    else
-        return errOpenFile;
+    char buffer[BUFFER_SIZE];
+    char logEntry[LOGENTRY_SIZE];
     
+    if (_timerSD - millis() < WRITE_DELAY) {
+      sprintf(logEntry, "%f;%f;%f;%f;%f;\n", lat, lon, gspeed, date, time);
+      strcat(buffer, logEntry);
+    }
+    else {
+      if (!_logFile.println (buffer))
+            return errWrite;
+      _timerSD=millis();
+    }
+  
     _logFile.flush();
 }
 
@@ -51,12 +53,15 @@ int SDmgmt::writeCoordinates (long lat, long lon, unsigned long date,
 *@fn void SDmgmt::changeFileName()
 *@brief Increment the name of the file and create it
 */
-void SDmgmt::changeFile() {
+int SDmgmt::changeFile() {
   
   _numFile = _numFile + 1;
   sprintf (_nameFile ,"gpslog%d.txt", _numFile);
   _logFile.close();
   _logFile = SD.open(_nameFile, FILE_WRITE);
+   if (!_logFile.println ("latitude;longitude;date;time;speed;"))
+      return errWrite;
+   return 1;
 
 }
 
