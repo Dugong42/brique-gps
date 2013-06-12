@@ -42,7 +42,7 @@ const char* MSG_MENUS[5]={"Distance", "Position", "Vitesse", "Stats", "Temps"};
 LCDhandler lcd;
 GPShandler gps;
 int affichage;
-SDmgmt sdCard;
+//SDmgmt sdCard;
 
 // FUNCTION
 // Initialisation
