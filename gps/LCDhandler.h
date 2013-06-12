@@ -2,9 +2,10 @@
 
 class LCDhandler {
     private:
-        int _ticks;
+        unsigned long _time;
         bool _isAvailable;
         LiquidCrystal _lcd;
+        void checkAvailable();
 
     public:
         LCDhandler();
@@ -13,5 +14,4 @@ class LCDhandler {
         void cls(int line);
         void notify(String s);
         void notify(String s, String type);
-        void incTicks();
 };

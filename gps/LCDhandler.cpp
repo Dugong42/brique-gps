@@ -14,8 +14,7 @@ const int LCD6 = 9;
 const int LCDC = 8;
 const int LCDR = 2;
 
-// Duration of a notification
-// Loop iterations, not seconds !
+// Duration of a notification in ms
 const int DELAYNOTIF = 1000;
 
 LCDhandler::LCDhandler() : _lcd(
@@ -26,6 +25,16 @@ LCDhandler::LCDhandler() : _lcd(
     _isAvailable = true;
     // Enable autoscroll for strings > LCDC
     //_lcd.autoscroll();
+}
+
+// PROCEDURE
+// Update lock
+void LCDhandler::checkAvailable() {
+    if (! _isAvailable) {
+        if (millis()-_time >= DELAYNOTIF) {
+            _isAvailable = true;
+        }
+    }
 }
 
 // PROCEDURE
@@ -47,6 +56,7 @@ void LCDhandler::cls(int line) {
 // String lendth must be < LCDC
 // Line must is numbered from 0 to LCDR
 void LCDhandler::printline(String s, int line) {
+    checkAvailable();
 
     // Check params
     if (line < LCDR && _isAvailable) {
@@ -69,6 +79,7 @@ void LCDhandler::printline(String s, int line) {
 // Notify user with for a while
 // ERR, INFO, WARN
 void LCDhandler::notify(String s, String type) {
+    checkAvailable();
     if (_isAvailable) {
         cls();
         printline("[" + type + "]", 0);
@@ -76,6 +87,7 @@ void LCDhandler::notify(String s, String type) {
 
         // "A while"
         _isAvailable = false;
+        _time = millis();
     }
 }
 
@@ -85,14 +97,3 @@ void LCDhandler::notify(String s) {
     notify(s, "GPS");
 }
 
-// PROCEDURE
-// Increase ticks
-void LCDhandler::incTicks() {
-    if (! _isAvailable) {
-        _ticks = (_ticks + 1);
-        if (_ticks == DELAYNOTIF) {
-            _isAvailable = true;
-            _ticks = 0;
-        }
-    }
-}

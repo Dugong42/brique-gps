@@ -110,8 +110,9 @@ void printInfos() {
 
         case 2 :
             // Show Speed
+            // TODO print unit
             lcd.printline(String(gps.getSpeed()),0);
-            lcd.printline(String("???? m/s"), 1);
+            lcd.printline(String("cm/s"), 1);
             break;
 
         case 3 :
@@ -129,8 +130,8 @@ void printInfos() {
 
         default :
             // Error
-            lcd.printline(String("Undefined"),0);
-            lcd.printline(String("information"),1);
+            lcd.printline(String("Undef"),0);
+            lcd.printline(String("Text"),1);
     }
 }
 
@@ -139,13 +140,11 @@ void printInfos() {
 // Executes a different action depending on the state of the buttons.
 void handleButtons() {
     unsigned long timer;
-
     switch (demuxButtons()) {
         case 1:
             // Start, Stop, Reset
             timer=millis();
 
-            // TODO: Make sure this line works and has the correct behavior
             while (demuxButtons() == 1 && millis()-timer < RSTDELAY) {;}
 
             if (millis()-timer >= RSTDELAY) {
@@ -159,32 +158,31 @@ void handleButtons() {
                 gps.toggle();
                 gps.isRunning() ? lcd.notify("Running") : lcd.notify("Paused");
             }
-            while (demuxButtons() == 1) {;}
+            while (demuxButtons() == 1);
             break;
 
         case 2:
             // Print various information
             affichage = (affichage + 1) % 5;
             lcd.notify(MSG_MENUS[affichage], "MENU");
-            while (demuxButtons() == 2) {;}
+            while (demuxButtons() == 2);
             break;
 
         case 3:
             // TODO Changing recording mode
             // TODO Explain this
             lcd.notify("REC MODE");
-            while (demuxButtons() == 3) {;}
+            while (demuxButtons() == 3);
             break;
 
         case 4:
             // TODO PC Transfert
             lcd.notify("USB SYNC");
-            while (demuxButtons() == 4) {;}
+            while (demuxButtons() == 4);
             break;
 
         case 0:
-            // Increase ticks if nothing is pressed
-            lcd.incTicks();
+            // Nothing to do if nothing is pressed
             break;
 
         default:
