@@ -79,7 +79,6 @@ void LCDhandler::printline(String s, int line) {
 // Notify user with for a while
 // ERR, INFO, WARN
 void LCDhandler::notify(String s, String type) {
-    checkAvailable();
     if (_isAvailable) {
         cls();
         printline("[" + type + "]", 0);
