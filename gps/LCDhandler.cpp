@@ -15,7 +15,7 @@ const int LCDC = 8;
 const int LCDR = 2;
 
 // Duration of a notification in ms
-const int DELAYNOTIF = 1000;
+const int DELAYNOTIF = 800;
 
 LCDhandler::LCDhandler() : _lcd(
         LiquidCrystal(LCD1, LCD2, LCD3, LCD4, LCD5, LCD6)) {
