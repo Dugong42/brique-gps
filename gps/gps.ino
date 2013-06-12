@@ -180,7 +180,8 @@ void handleButtons() {
             break;
 
         case 0:
-            // Nothing to do if nothing is pressed
+            // Increase ticks if nothing is pressed
+            lcd.incTicks();
             break;
 
         default:

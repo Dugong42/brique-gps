@@ -15,13 +15,15 @@ const int LCDC = 8;
 const int LCDR = 2;
 
 // Duration of a notification
-const int DELAYNOTIF = 700;
+// Loop iterations
+const int DELAYNOTIF = 1000;
 
 LCDhandler::LCDhandler() : _lcd(
         LiquidCrystal(LCD1, LCD2, LCD3, LCD4, LCD5, LCD6)) {
 
     // Init LCD size
     _lcd.begin(LCDC, LCDR);
+    _isAvailable = true;
     // Enable autoscroll for strings > LCDC
     //_lcd.autoscroll();
 }
@@ -47,7 +49,7 @@ void LCDhandler::cls(int line) {
 void LCDhandler::printline(String s, int line) {
 
     // Check params
-    if (line < LCDR) {
+    if (line < LCDR && _isAvailable) {
         cls(line);
         _lcd.setCursor(0, line);
 
@@ -72,14 +74,23 @@ void LCDhandler::notify(String s, String type) {
     printline(s, 1);
 
     // "A while"
-    // TODO stop blocking program
-    // using print buffers
-    delay(DELAYNOTIF);
-    cls();
+    _isAvailable = false;
 }
 
 // PROCEDURE
 // Notify user with no notification type
 void LCDhandler::notify(String s) {
     notify(s, "GPS");
+}
+
+// PROCEDURE
+// Increase ticks
+void LCDhandler::incTicks() {
+    if (! _isAvailable) {
+        _ticks = (_ticks + 1);
+        if (_ticks == DELAYNOTIF) {
+            _isAvailable = true;
+            _ticks = 0;
+        }
+    }
 }
