@@ -29,8 +29,8 @@ const int TXPIN = 2;
 // Delay to press button to reset
 const int RSTDELAY = 2000;
 
-// Delay a notification message lasts
-const int PRINTDELAY = 300;
+// Delay min between 2 button pressures
+const unsigned long DELAYBUTTON = 250;
 
 // Nautical mile per hour (knot) in meters per second (m/s)
 const double KNOT_CONV = 0.514444444;
@@ -41,21 +41,23 @@ const char* MSG_MENUS[5]={"Distance", "Position", "Vitesse", "Stats", "Temps"};
 // Init external components
 LCDhandler lcd;
 GPShandler gps;
+unsigned long timer;
 int affichage;
 //SDmgmt sdCard;
 
 // FUNCTION
 // Initialisation
 void setup() {
+    timer=millis();
 
     //voir exemple arduino SD pour la raison de cette ligne
     pinMode(10, OUTPUT);
 
     //Initialisation carte
-//    if (!SD.begin(10)) {
-//        lcd.print("Error initialisation SD");
-//        delay(PRINTDELAY);
-//    }
+    //    if (!SD.begin(10)) {
+    //        lcd.print("Error initialisation SD");
+    //        delay(PRINTDELAY);
+    //    }
 
     affichage = 1;
 
@@ -139,55 +141,57 @@ void printInfos() {
 // Buttons behavior definition.
 // Executes a different action depending on the state of the buttons.
 void handleButtons() {
-    unsigned long timer;
-    switch (demuxButtons()) {
-        case 1:
-            // Start, Stop, Reset
-            timer=millis();
+    unsigned long rsttimer;
+    if (millis()-timer > DELAYBUTTON) {
+        switch (demuxButtons()) {
+            case 1:
+                // Start, Stop, Reset
+                rsttimer=millis();
 
-            while (demuxButtons() == 1 && millis()-timer < RSTDELAY) {;}
+                while (demuxButtons() == 1 && millis()-rsttimer < RSTDELAY) {;}
 
-            if (millis()-timer >= RSTDELAY) {
-                gps.stop();
-                lcd.notify("RESET");
+                if (millis()-rsttimer >= RSTDELAY) {
+                    gps.stop();
+                    lcd.notify("RESET");
 
-                //The file on the SD is closed and another one is oponed when the system reset
-                //sdCard.changeFile();
+                    //The file on the SD is closed and another one is oponed when the system reset
+                    //sdCard.changeFile();
 
-            } else {
-                gps.toggle();
-                gps.isRunning() ? lcd.notify("Running") : lcd.notify("Paused");
-            }
-            while (demuxButtons() == 1);
-            break;
+                } else {
+                    gps.toggle();
+                    gps.isRunning() ? lcd.notify("Running") : lcd.notify("Paused");
+                }
+                while (demuxButtons() == 1);
+                break;
 
-        case 2:
-            // Print various information
-            affichage = (affichage + 1) % 5;
-            lcd.notify(MSG_MENUS[affichage], "MENU");
-            while (demuxButtons() == 2);
-            break;
+            case 2:
+                // Print various information
+                affichage = (affichage + 1) % 5;
+                lcd.notify(MSG_MENUS[affichage], "MENU");
+                break;
 
-        case 3:
-            // TODO Changing recording mode
-            // TODO Explain this
-            lcd.notify("REC MODE");
-            while (demuxButtons() == 3);
-            break;
+            case 3:
+                // TODO Changing recording mode
+                // TODO Explain this
+                lcd.notify("REC MODE");
+                break;
 
-        case 4:
-            // TODO PC Transfert
-            lcd.notify("USB SYNC");
-            while (demuxButtons() == 4);
-            break;
+            case 4:
+                // TODO PC Transfert
+                lcd.notify("USB SYNC");
+                break;
 
-        case 0:
-            // Nothing to do if nothing is pressed
-            break;
+            case 0:
+                // Nothing to do if nothing is pressed
+                break;
 
-        default:
-            // Error
-            lcd.notify("Invalid Button state", "ERR");
+            default:
+                // Error
+                lcd.notify("Invalid Button state", "ERR");
+        }
+        if (demuxButtons() != 0)
+            // New timer value
+            timer = millis();
     }
 }
 

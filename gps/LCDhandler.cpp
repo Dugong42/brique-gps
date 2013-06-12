@@ -15,7 +15,7 @@ const int LCDC = 8;
 const int LCDR = 2;
 
 // Duration of a notification in ms
-const int DELAYNOTIF = 800;
+const int DELAYNOTIF = 700;
 
 LCDhandler::LCDhandler() : _lcd(
         LiquidCrystal(LCD1, LCD2, LCD3, LCD4, LCD5, LCD6)) {
@@ -40,13 +40,13 @@ void LCDhandler::checkAvailable() {
 // PROCEDURE
 // Clear the screen
 void LCDhandler::cls() {
-    _lcd.home();
+    _lcd.clear();
 }
 
 // PROCEDURE
 // Clear a line
 void LCDhandler::cls(int line) {
-    for (int i=LCDC; i < LCDC; i++)
+    for (int i=0; i < LCDC; i++)
         _lcd.print(" ");
 }
 
@@ -79,15 +79,14 @@ void LCDhandler::printline(String s, int line) {
 // Notify user with for a while
 // ERR, INFO, WARN
 void LCDhandler::notify(String s, String type) {
-    if (_isAvailable) {
-        cls();
-        printline("[" + type + "]", 0);
-        printline(s, 1);
+    cls();
+    _lcd.print("[" + type + "]");
+    _lcd.setCursor(0, 1);
+    _lcd.print(s);
 
-        // "A while"
-        _isAvailable = false;
-        _time = millis();
-    }
+    // "A while"
+    _isAvailable = false;
+    _time = millis();
 }
 
 // PROCEDURE
