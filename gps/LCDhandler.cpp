@@ -15,7 +15,7 @@ const int LCDC = 8;
 const int LCDR = 2;
 
 // Duration of a notification
-// Loop iterations
+// Loop iterations, not seconds !
 const int DELAYNOTIF = 1000;
 
 LCDhandler::LCDhandler() : _lcd(
@@ -69,12 +69,14 @@ void LCDhandler::printline(String s, int line) {
 // Notify user with for a while
 // ERR, INFO, WARN
 void LCDhandler::notify(String s, String type) {
-    cls();
-    printline("[" + type + "]", 0);
-    printline(s, 1);
+    if (_isAvailable) {
+        cls();
+        printline("[" + type + "]", 0);
+        printline(s, 1);
 
-    // "A while"
-    _isAvailable = false;
+        // "A while"
+        _isAvailable = false;
+    }
 }
 
 // PROCEDURE

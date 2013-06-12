@@ -155,28 +155,31 @@ void handleButtons() {
                 //The file on the SD is closed and another one is oponed when the system reset
                 //sdCard.changeFile();
 
-                while (demuxButtons() == 1) {;}
             } else {
                 gps.toggle();
                 gps.isRunning() ? lcd.notify("Running") : lcd.notify("Paused");
             }
+            while (demuxButtons() == 1) {;}
             break;
 
         case 2:
             // Print various information
             affichage = (affichage + 1) % 5;
             lcd.notify(MSG_MENUS[affichage], "MENU");
+            while (demuxButtons() == 2) {;}
             break;
 
         case 3:
             // TODO Changing recording mode
             // TODO Explain this
             lcd.notify("REC MODE");
+            while (demuxButtons() == 3) {;}
             break;
 
         case 4:
             // TODO PC Transfert
             lcd.notify("USB SYNC");
+            while (demuxButtons() == 4) {;}
             break;
 
         case 0:
@@ -192,11 +195,9 @@ void handleButtons() {
 
 // This function will loop forever
 void loop() {
-
-    gps.countTick();
     handleButtons();
     printInfos();
-    gps.refreshData();
+    gps.refreshData(lcd);
     //Assuming we write everything, data is logged here
     //TODO Do we write everything ? If no, what do we check ?
     //sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(), gps.getTime(), gps.getSpeed());

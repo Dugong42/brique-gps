@@ -1,5 +1,5 @@
 #include <SoftwareSerial.h>
-#include <LiquidCrystal.h>
+#include "LCDhandler.h"
 #include "GPShandler.h"
 #include "TinyGPS.h"
 
@@ -29,7 +29,6 @@ GPShandler::GPShandler() : _nss(SoftwareSerial(RXPIN, TXPIN)) {
     _chars = 0;
     _isRunning  = false;
     _isReceived = false;
-    _ticks = 0;
     _nss.begin(BAUDS);
 
     // Elapsed time in ms after value encoding
@@ -51,15 +50,13 @@ unsigned long GPShandler::getChars() { return _chars; }
 void GPShandler::run()    { _isRunning = true;        }
 void GPShandler::stop()   { _isRunning = false;       }
 void GPShandler::toggle() { _isRunning = !_isRunning; }
-void GPShandler::countTick() { _ticks++; }
 
 // Information refreshing
-void GPShandler::refreshData(/*LiquidCrystal & lcd*/) {
+void GPShandler::refreshData(LCDhandler & lcd) {
     unsigned long timer;
 
-    if (_isRunning && _nss.available() /*&& _ticks%10 == 0*/ ) {
+    if (_isRunning && _nss.available()) {
         // Serial Link UP
-        
         timer = millis();
         do {
             // We try to read a full message, handling transmission timeout in
@@ -82,12 +79,7 @@ void GPShandler::refreshData(/*LiquidCrystal & lcd*/) {
                 _gps.stats(&_chars, &_sentences, &_failed_checksum);
             }
         } while (_nss.available() && !_isReceived && (millis()-timer < TIMEOUT));
-    }/*
-    else {
-        if (! _nss.available()) {
-            lcd.clear();
-            lcd.print("SerialErr");
-            delay(700);
-        }
-    }*/
+        if (millis()-timer > TIMEOUT)
+            lcd.notify("Timeout", "ERR");
+    }
 }
