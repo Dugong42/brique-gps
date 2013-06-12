@@ -46,6 +46,7 @@ void LCDhandler::cls() {
 // PROCEDURE
 // Clear a line
 void LCDhandler::cls(int line) {
+    _lcd.setCursor(0, line);
     for (int i=0; i < LCDC; i++)
         _lcd.print(" ");
 }
@@ -60,7 +61,6 @@ void LCDhandler::printline(String s, int line) {
 
     // Check params
     if (line < LCDR && _isAvailable) {
-        cls(line);
         _lcd.setCursor(0, line);
 
         // Allow to print a string < 8 chars
