@@ -44,7 +44,7 @@ const char* MSG_MENUS[6]={"Distance", "Position", "Vitesse", "Stats 1", "Stats 2
 // Init external components
 LCDhandler lcd;
 GPShandler gps;
-//SDhandler sdCard;
+SDhandler sdCard;
 
 // Declaration of used variables
 unsigned long timer;
@@ -60,8 +60,9 @@ void setup() {
     curTimer=millis();
     prevTimer=curTimer;
 
+    pinMode(10, OUTPUT);
     affichage = 1;
-
+    sdCard.init();
     // I'm always ready for you bro
     lcd.notify("READY");
 }
@@ -124,7 +125,7 @@ void printInfos() {
             lcd.printline(String(gps.getFailed()),0);
             lcd.printline(String(gps.getSentences())+" "+String(gps.getChars()),1);
             break;
-            
+
         case 4 :
             // Show Stat
             lcd.printline(String((curTimer-prevTimer)/CYCLE_NUMBER)+"ms",0);
@@ -206,7 +207,7 @@ void handleButtons() {
 void loop() {
     handleButtons();
     printInfos();
-    
+
     meanTick=(meanTick+1)%CYCLE_NUMBER;
     gps.refreshData(lcd);
     if (meanTick==0) {

@@ -6,30 +6,29 @@
 
 #include <SD.h>
 #include "SDhandler.h"
-#include <SoftwareSerial.h>
+#include "LCDhandler.h"
 
 //Constructor
-SDhandler::SDhandler(){
-    
-    delay(1000);
+SDhandler::SDhandler() {
+    _nameFile[NAMESIZE];
+    _buffer[BUFFER_SIZE];
+}
+
+// METHOD
+// Init SD
+int SDhandler::init() {
     //voir exemple arduino SD pour la raison de cette ligne
-    pinMode(10, OUTPUT);
-  //  Initialisation carte
-    Serial.begin(9600);
-    Serial.print("\nInitializing SD card...");
+    //  Initialisation carte
     if (!SD.begin()) {
-      Serial.print("\nSup ?");
     }
-   
+
     strcpy (_nameFile, "gpslog00.txt");
     _numFile = 0;
 
-    Serial.print("\nOpnneing SD...");
     _logFile = SD.open(_nameFile, FILE_WRITE);
-    Serial.print("\nCa a open ! SD card...");
     _timerSD=millis();
-}
 
+}
 
 /**
  *\fn int writeCoordinates (long lat, long lon, long date, long time)
@@ -47,21 +46,21 @@ SDhandler::SDhandler(){
 int SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
         unsigned long time, unsigned long gspeed)
 {
-    
+
     char logEntry[LOGENTRY_SIZE];
 
     if (millis() - _timerSD < WRITE_DELAY) {
         sprintf(logEntry, "%f;%f;%f;%f;%f;\n", lat, lon, gspeed, date, time);
-        strcat(buffer, logEntry);
+        strcat(_buffer, logEntry);
     }
     else {
-        if (!_logFile.println (buffer))
+        if (!_logFile.println (_buffer))
             return errWrite;
         _timerSD=millis();
         _logFile.flush();
     }
 
-    
+
 }
 
 /**
