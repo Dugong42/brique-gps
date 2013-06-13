@@ -16,11 +16,21 @@ SDhandler::SDhandler() {
 // METHOD
 // Init SD
 int SDhandler::init() {
-    //voir exemple arduino SD pour la raison de cette ligne
     //  Initialisation carte
-
-    strcpy (_nameFile, "gpslog00.txt");
-    _numFile = 00;
+    
+    if (!SD.exists("lastfile.txt")) {
+        _lastFile = SD.open("lastfile.txt", FILE_WRITE);
+        _numFile=0;
+        _lastFile.write(_numFile);
+        strcpy (_nameFile, "gpslog0.txt");
+    }
+    else {
+        _lastFile = SD.open("lastfile.txt", FILE_READ);
+        _numFile = _lastFile.read();
+        _lastFile.close();
+        _numFile = _numFile + 1;
+        sprintf (_nameFile ,"gpslog%d.txt", _numFile);
+    }
 
     _logFile = SD.open(_nameFile, FILE_WRITE);
     _timerSD=millis();
@@ -72,6 +82,7 @@ int SDhandler::changeFile() {
     sprintf (_nameFile ,"gpslog%d.txt", _numFile);
 
     _lastFile = SD.open("lastfile", FILE_WRITE);
+    _lastFile.seek(0);
     _lastFile.write(_numFile);
     _lastFile.close();
 
