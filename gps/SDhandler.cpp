@@ -6,30 +6,26 @@
 
 #include <SD.h>
 #include "SDhandler.h"
-#include <SoftwareSerial.h>
+#include "LCDhandler.h"
 
 //Constructor
-SDhandler::SDhandler(){
-    
-    delay(1000);
+SDhandler::SDhandler(LCDhandler & lcd) : _logFile(File()) {
+   
+    lcd.notify("start", "SD");
     //voir exemple arduino SD pour la raison de cette ligne
     pinMode(10, OUTPUT);
   //  Initialisation carte
-    Serial.begin(9600);
-    Serial.print("\nInitializing SD card...");
+    
     if (!SD.begin()) {
-      Serial.print("\nSup ?");
+      
     }
    
     strcpy (_nameFile, "gpslog00.txt");
-    _numFile = 0;
+    _numFile = 00;
 
-    Serial.print("\nOpnneing SD...");
     _logFile = SD.open(_nameFile, FILE_WRITE);
-    Serial.print("\nCa a open ! SD card...");
     _timerSD=millis();
 }
-
 
 /**
  *\fn int writeCoordinates (long lat, long lon, long date, long time)
@@ -70,13 +66,21 @@ int SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
  */
 int SDhandler::changeFile() {
 
+    _logFile.close();
+  
     _numFile = _numFile + 1;
     sprintf (_nameFile ,"gpslog%d.txt", _numFile);
-    _logFile.close();
+    
+    _lastFile.SD.open(lastFile, FILE_WRITE);
+    _lastfile.write(_numFile);
+    _lastFile.close();
+    
     _logFile = SD.open(_nameFile, FILE_WRITE);
     if (!_logFile.println ("latitude;longitude;date;time;speed;"))
         return errWrite;
     return 1;
 
 }
+
+
 

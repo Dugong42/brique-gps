@@ -16,11 +16,12 @@ class SDhandler {
     char _nameFile[13];
     int _numFile;
     File _logFile;
+    File _lastFile;
     unsigned long _timerSD;
     char buffer[BUFFER_SIZE];
     
   public :
-    SDhandler();
+    SDhandler(LCDhandler &);
     int writeCoordinates (long lat, long lon, unsigned long date, unsigned long time, unsigned long gspeed);
     int changeFile(); 
 };
