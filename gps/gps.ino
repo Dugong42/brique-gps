@@ -19,6 +19,10 @@
 #include "SDhandler.h"
 #include "TinyGPS.h"
 
+#define  WRITE_BY_TIME  0
+#define  WRITE_BY_SPACE 1
+#define  WRITE_BY_BOTH  2
+
 // PINs
 const int BUT3  = 17;
 const int BUT2  = 16;
@@ -51,7 +55,7 @@ unsigned long timer;
 unsigned long curTimer, prevTimer; // Timers used to do a mean of the gps refresh rate
 int meanTick=0;
 int affichage;
-
+int writeMode=WRITE_BY_BOTH;
 
 // FUNCTION
 // Initialisation
@@ -179,9 +183,19 @@ void handleButtons() {
                 break;
 
             case 3:
-                // TODO Changing recording mode
-                // TODO Explain this
-                lcd.notify("REC MODE");
+                if (writeMode == WRITE_BY_BOTH) {
+                  lcd.notify("DEFAULT","REC MODE");
+                  writeMode = WRITE_BY_TIME;
+                }
+                else if (writeMode == WRITE_BY_TIME) {
+                  lcd.notify("BY TIME","REC MODE");
+                  writeMode = WRITE_BY_SPACE;
+                }
+                else if (writeMode == WRITE_BY_SPACE) {
+                  lcd.notify("BY SPACE","REC MODE");
+                  writeMode = WRITE_BY_BOTH;
+                }
+                
                 break;
 
             case 4:
