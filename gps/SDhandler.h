@@ -12,6 +12,7 @@ class SDhandler {
         char _nameFile[];
         int _numFile;
         File _logFile;
+        File _lastFile;
         unsigned long _timerSD;
         char _buffer[];
 

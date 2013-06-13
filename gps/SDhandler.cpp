@@ -6,7 +6,6 @@
 
 #include <SD.h>
 #include "SDhandler.h"
-#include "LCDhandler.h"
 
 //Constructor
 SDhandler::SDhandler() {
@@ -19,11 +18,9 @@ SDhandler::SDhandler() {
 int SDhandler::init() {
     //voir exemple arduino SD pour la raison de cette ligne
     //  Initialisation carte
-    if (!SD.begin()) {
-    }
 
     strcpy (_nameFile, "gpslog00.txt");
-    _numFile = 0;
+    _numFile = 00;
 
     _logFile = SD.open(_nameFile, FILE_WRITE);
     _timerSD=millis();
@@ -69,13 +66,21 @@ int SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
  */
 int SDhandler::changeFile() {
 
+    _logFile.close();
+
     _numFile = _numFile + 1;
     sprintf (_nameFile ,"gpslog%d.txt", _numFile);
-    _logFile.close();
+
+    _lastFile = SD.open("lastfile", FILE_WRITE);
+    _lastFile.write(_numFile);
+    _lastFile.close();
+
     _logFile = SD.open(_nameFile, FILE_WRITE);
     if (!_logFile.println ("latitude;longitude;date;time;speed;"))
         return errWrite;
     return 1;
 
 }
+
+
 
