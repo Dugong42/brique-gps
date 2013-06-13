@@ -1,18 +1,32 @@
 /**
- * \file SDmgmt.c
+ * \file SDhandler.c
  * \brief Fonctions pour sauvegarder des informations sur la carte SD
  * \date 9 Juin 2013
  */
 
 #include <SD.h>
 #include "SDhandler.h"
-
+#include <SoftwareSerial.h>
 
 //Constructor
-SDmgmt::SDmgmt(){
-    strcpy(_nameFile, "gpslog00.txt");
+SDhandler::SDhandler(){
+    
+    delay(1000);
+    //voir exemple arduino SD pour la raison de cette ligne
+    pinMode(10, OUTPUT);
+  //  Initialisation carte
+    Serial.begin(9600);
+    Serial.print("\nInitializing SD card...");
+    if (!SD.begin()) {
+      Serial.print("\nSup ?");
+    }
+   
+    strcpy (_nameFile, "gpslog00.txt");
     _numFile = 0;
+
+    Serial.print("\nOpnneing SD...");
     _logFile = SD.open(_nameFile, FILE_WRITE);
+    Serial.print("\nCa a open ! SD card...");
     _timerSD=millis();
 }
 
@@ -30,13 +44,13 @@ SDmgmt::SDmgmt(){
  *	   -1 si ne peut pas ouvrir le fichier
  *	   -2 si erreur ecriture
  */
-int SDmgmt::writeCoordinates (long lat, long lon, unsigned long date,
+int SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
         unsigned long time, unsigned long gspeed)
 {
-    char buffer[BUFFER_SIZE];
+    
     char logEntry[LOGENTRY_SIZE];
 
-    if (_timerSD - millis() < WRITE_DELAY) {
+    if (millis() - _timerSD < WRITE_DELAY) {
         sprintf(logEntry, "%f;%f;%f;%f;%f;\n", lat, lon, gspeed, date, time);
         strcat(buffer, logEntry);
     }
@@ -44,16 +58,17 @@ int SDmgmt::writeCoordinates (long lat, long lon, unsigned long date,
         if (!_logFile.println (buffer))
             return errWrite;
         _timerSD=millis();
+        _logFile.flush();
     }
 
-    _logFile.flush();
+    
 }
 
 /**
- *@fn void SDmgmt::changeFileName()
+ *@fn void SDhandler::changeFileName()
  *@brief Increment the name of the file and create it
  */
-int SDmgmt::changeFile() {
+int SDhandler::changeFile() {
 
     _numFile = _numFile + 1;
     sprintf (_nameFile ,"gpslog%d.txt", _numFile);

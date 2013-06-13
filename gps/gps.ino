@@ -44,13 +44,14 @@ const char* MSG_MENUS[6]={"Distance", "Position", "Vitesse", "Stats 1", "Stats 2
 // Init external components
 LCDhandler lcd;
 GPShandler gps;
+//SDhandler sdCard;
 
 // Declaration of used variables
 unsigned long timer;
 unsigned long curTimer, prevTimer; // Timers used to do a mean of the gps refresh rate
 int meanTick=0;
 int affichage;
-//SDmgmt sdCard;
+
 
 // FUNCTION
 // Initialisation
@@ -58,15 +59,6 @@ void setup() {
     timer=millis();
     curTimer=millis();
     prevTimer=curTimer;
-    
-    //voir exemple arduino SD pour la raison de cette ligne
-    pinMode(10, OUTPUT);
-
-    //Initialisation carte
-    //    if (!SD.begin(10)) {
-    //        lcd.print("Error initialisation SD");
-    //        delay(PRINTDELAY);
-    //    }
 
     affichage = 1;
 
