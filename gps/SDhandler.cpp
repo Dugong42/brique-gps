@@ -56,18 +56,11 @@ int SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
 
     char logEntry[LOGENTRY_SIZE];
 
-    if (millis() - _timerSD < WRITE_DELAY) {
-        sprintf(logEntry, "%f;%f;%f;%f;%f;\n", lat, lon, gspeed, date, time);
-        strcat(_buffer, logEntry);
-    }
-    else {
-        if (!_logFile.println (_buffer))
-            return errWrite;
-        _timerSD=millis();
-        _logFile.flush();
-    }
-
-
+    sprintf(logEntry, "%f;%f;%f;%f;%f;", lat, lon, gspeed, date, time);
+    strcat(_buffer, logEntry);
+    if (!_logFile.println (logEntry))
+        return errWrite;
+    _logFile.flush();
 }
 
 /**
