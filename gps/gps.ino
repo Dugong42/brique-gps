@@ -40,10 +40,10 @@ const unsigned long DELAYBUTTON = 250;
 const double KNOT_CONV = 0.514444444;
 
 // Number of cycles to do the refresh rate mean on
-const int CYCLE_NUMBER = 20;
+const int CYCLE_NUMBER = 100;
 
 // Printed text
-const char* MSG_MENUS[6]={"Distance", "Position", "Vitesse", "Stats 1", "Stats 2", "Temps"};
+const char* MSG_MENUS[6]={"Distance", "Position", "Vitesse", "Stats", "LoopRate", "Temps"};
 
 // Init external components
 LCDhandler lcd;
@@ -132,8 +132,8 @@ void printInfos() {
 
         case 4 :
             // Show Stat
-            lcd.printline(String((curTimer-prevTimer)/CYCLE_NUMBER)+"ms",0);
-            lcd.cls(1);
+            lcd.printline("Average",0);
+            lcd.printline(String((curTimer-prevTimer)/CYCLE_NUMBER)+" ms",1);
             break;
 
         case 5 :
@@ -178,24 +178,24 @@ void handleButtons() {
 
             case 2:
                 // Print various information
-                affichage = (affichage + 1) % 5;
+                affichage = (affichage + 1) % 6;
                 lcd.notify(MSG_MENUS[affichage], "MENU");
                 break;
 
             case 3:
                 if (writeMode == WRITE_BY_BOTH) {
-                  lcd.notify("DEFAULT","REC MODE");
-                  writeMode = WRITE_BY_TIME;
+                    lcd.notify("DEFAULT","REC MODE");
+                    writeMode = WRITE_BY_TIME;
                 }
                 else if (writeMode == WRITE_BY_TIME) {
-                  lcd.notify("BY TIME","REC MODE");
-                  writeMode = WRITE_BY_SPACE;
+                    lcd.notify("BY TIME","REC MODE");
+                    writeMode = WRITE_BY_SPACE;
                 }
                 else if (writeMode == WRITE_BY_SPACE) {
-                  lcd.notify("BY SPACE","REC MODE");
-                  writeMode = WRITE_BY_BOTH;
+                    lcd.notify("BY SPACE","REC MODE");
+                    writeMode = WRITE_BY_BOTH;
                 }
-                
+
                 break;
 
             case 4:
@@ -221,13 +221,15 @@ void handleButtons() {
 void loop() {
     handleButtons();
     printInfos();
-
-    meanTick=(meanTick+1)%CYCLE_NUMBER;
     gps.refreshData(lcd);
+
+    // Estimate the time spent for CYCLE_NUMBER loops
+    meanTick=(meanTick+1)%CYCLE_NUMBER;
     if (meanTick==0) {
-      prevTimer=curTimer;
-      curTimer=millis();
+        prevTimer=curTimer;
+        curTimer=millis();
     }
+
     //Assuming we write everything, data is logged here
     //TODO Do we write everything ? If no, what do we check ?
     //sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(), gps.getTime(), gps.getSpeed());
