@@ -1,3 +1,5 @@
+#ifndef LCDHANDLER_H
+#define LCDHANDLER_H
 #include <LiquidCrystal.h>
 
 class LCDhandler {
@@ -15,3 +17,4 @@ class LCDhandler {
         void notify(String s);
         void notify(String s, String type);
 };
+#endif

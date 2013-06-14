@@ -1,5 +1,9 @@
+#ifndef GPSHANDLER_H
+#define GPSHANDLER_H
+
 #include <SoftwareSerial.h>
 #include "TinyGPS.h"
+#include "LCDhandler.h"
 
 class GPShandler {
     private:
@@ -33,3 +37,4 @@ class GPShandler {
         void refreshData(LCDhandler &);
         bool isRunning();
 };
+#endif
