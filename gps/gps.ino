@@ -18,6 +18,7 @@
 #include "GPShandler.h"
 #include "SDhandler.h"
 #include "TinyGPS.h"
+#include "NavHandler.h"
 
 #define  WRITE_BY_TIME  0
 #define  WRITE_BY_SPACE 1
@@ -49,6 +50,7 @@ const char* MSG_MENUS[6]={"Distance", "Position", "Vitesse", "Stats", "LoopRate"
 LCDhandler lcd;
 GPShandler gps;
 SDhandler sdCard;
+//NavHandler nav(gps);
 
 // Declaration of used variables
 unsigned long timer;
