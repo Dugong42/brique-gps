@@ -30,6 +30,7 @@ const int BUT2  = 16;
 const int BUT1  = 15;
 const int RXPIN = 3;
 const int TXPIN = 2;
+const int VOLTPIN = 15;
 
 // Delay to press button to reset
 const int RSTDELAY = 2000;
@@ -58,6 +59,7 @@ unsigned long curTimer, prevTimer; // Timers used to do a mean of the gps refres
 int meanTick=0;
 int affichage;
 int writeMode=WRITE_BY_BOTH;
+int voltage;
 
 // FUNCTION
 // Initialisation
@@ -69,8 +71,14 @@ void setup() {
     pinMode(10, OUTPUT);
     affichage = 1;
     sdCard.init();
+    
+    //analogReag return an int between 0 and 1023
+    voltage = analogRead(VOLTPIN);
+    //Affiche en pourcentage si je me rapelle de ma règle de 3
+    String batteryLvl = String(voltage*100/1023) + "%";
+    
     // I'm always ready for you bro
-    lcd.notify("READY");
+    lcd.notify(batteryLvl, "READY");
 }
 
 // FUNCTION
