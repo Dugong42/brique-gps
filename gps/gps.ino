@@ -75,7 +75,7 @@ void setup() {
     //analogReag return an int between 0 and 1023
     voltage = analogRead(VOLTPIN);
     //Affiche en pourcentage si je me rapelle de ma règle de 3
-    String batteryLvl = String(voltage*100/1023) + "%";
+    String batteryLvl = String(voltage*3.3/1023) + "%";
     
     // I'm always ready for you bro
     lcd.notify(batteryLvl, "READY");
