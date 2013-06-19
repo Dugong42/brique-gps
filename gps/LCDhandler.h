@@ -11,10 +11,10 @@ class LCDhandler {
 
     public:
         LCDhandler();
-        void printline(String s, int line);
+        void printline(char* s, int line);
         void cls();
         void cls(int line);
-        void notify(String s);
-        void notify(String s, String type);
+        void notify(char* s);
+        void notify(char* s, char* type);
 };
 #endif

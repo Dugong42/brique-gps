@@ -56,7 +56,7 @@ void LCDhandler::cls(int line) {
 // Clear end of line
 // String lendth must be < LCDC
 // Line must is numbered from 0 to LCDR
-void LCDhandler::printline(String s, int line) {
+void LCDhandler::printline(char* s, int line) {
     checkAvailable();
 
     // Check params
@@ -67,20 +67,19 @@ void LCDhandler::printline(String s, int line) {
         _lcd.print(s);
 
         // Clear end of line
-        int l = s.length();
-        if (l < 8) {
-            for (int i=l; i < LCDC; i++)
-                _lcd.print(" ");
-        }
+
+        for (int i=0; i < LCDC; i++)
+            _lcd.print(" ");
+        
     }
 }
 
 // PROCEDURE
 // Notify user with for a while
 // ERR, INFO, WARN
-void LCDhandler::notify(String s, String type) {
+void LCDhandler::notify(char* s, char* type) {
     cls();
-    _lcd.print("[" + type + "]");
+    _lcd.print(strcat(strcat("[",type),"]"));
     _lcd.setCursor(0, 1);
     _lcd.print(s);
 
@@ -91,7 +90,7 @@ void LCDhandler::notify(String s, String type) {
 
 // PROCEDURE
 // Notify user with no notification type
-void LCDhandler::notify(String s) {
+void LCDhandler::notify(char* s) {
     notify(s, "GPS");
 }
 

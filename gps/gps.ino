@@ -45,7 +45,7 @@ const double KNOT_CONV = 0.514444444;
 const int CYCLE_NUMBER = 100;
 
 // Printed text
-const char* MSG_MENUS[6]={"Distance", "Position", "Vitesse", "Stats", "LoopRate", "Temps"};
+char* MSG_MENUS[6]={"Distance", "Position", "Vitesse", "Stats", "LoopRate", "Temps"};
 
 // Init external components
 LCDhandler lcd;
@@ -75,7 +75,7 @@ void setup() {
     //analogReag return an int between 0 and 1023
     voltage = analogRead(VOLTPIN);
     //Affiche en pourcentage si je me rapelle de ma règle de 3
-    String batteryLvl = String(voltage*3300/1023) + "mV";
+    char* batteryLvl = strcat((char*)(voltage*3300/1023),"mV");
     
     // I'm always ready for you bro
     lcd.notify(batteryLvl, "READY");
@@ -122,40 +122,40 @@ void printInfos() {
 
         case 1 :
             // Show Lat/Long
-            lcd.printline(String(gps.getLat()), 0);
-            lcd.printline(String(gps.getLon()), 1);
+            lcd.printline((char*)(gps.getLat()), 0);
+            lcd.printline((char*)(gps.getLon()), 1);
             break;
 
         case 2 :
             // Show Speed
             // TODO print unit
-            lcd.printline(String(gps.getSpeed()),0);
-            lcd.printline(String("cm/s"), 1);
+            lcd.printline((char*)(gps.getSpeed()),0);
+            lcd.printline((char*)("cm/s"), 1);
             break;
 
         case 3 :
             // Show info
             // TODO put this in a GPShandler method
-            lcd.printline(String(gps.getFailed()),0);
-            lcd.printline(String(gps.getSentences())+" "+String(gps.getChars()),1);
+            lcd.printline((char*)gps.getFailed(),0);
+            lcd.printline((char*)gps.getSentences(),1);
             break;
 
         case 4 :
             // Show Stat
             lcd.printline("Average",0);
-            lcd.printline(String((curTimer-prevTimer)/CYCLE_NUMBER)+" ms",1);
+            lcd.printline(strcat((char*)((curTimer-prevTimer)/CYCLE_NUMBER)," ms"),1);
             break;
 
         case 5 :
             // Show Date
-            lcd.printline(String(gps.getDate()),0);
-            lcd.printline(String(gps.getTime()),1);
+            lcd.printline((char*)(gps.getDate()),0);
+            lcd.printline((char*)(gps.getTime()),1);
             break;
 
         default :
             // Error
-            lcd.printline(String("Undef"),0);
-            lcd.printline(String("Text"),1);
+            lcd.printline((char*)("Undef"),0);
+            lcd.printline((char*)("Text"),1);
     }
 }
 
@@ -240,9 +240,5 @@ void loop() {
         prevTimer=curTimer;
         curTimer=millis();
     }
-
-    //Assuming we write everything, data is logged here
-    //TODO Do we write everything ? If no, what do we check ?
-    //sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(), gps.getTime(), gps.getSpeed());
 }
 
