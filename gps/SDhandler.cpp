@@ -17,7 +17,7 @@ SDhandler::SDhandler() {
 // Init SD
 int SDhandler::init() {
     //  Initialisation carte
-    
+
     if (!SD.exists("lastfile.txt")) {
         _lastFile = SD.open("lastfile.txt", FILE_WRITE);
         _numFile=0;
@@ -85,5 +85,27 @@ int SDhandler::changeFile() {
 
 }
 
+// PROCEDURE
+// read a file "filename" to Serial port
+void SDhandler::dumpFile(LCDhandler lcd, char* filename) {
+    // open the file. note that only one file can be open at a time,
+    // so you have to close this one before opening another.
+    File gpsFile = SD.open(filename);
+
+    // if the file is available, write to it:
+    if (gpsFile) {
+        while (gpsFile.available()) {
+            lcd.printline("Reading",0);
+            lcd.printline(filename,1);
+            Serial.write(gpsFile.read());
+        }
+        gpsFile.close();
+        lcd.notify("Sync OK.","INFO");
+    }
+    // if the file isn't open, pop up an error:
+    else {
+        lcd.notify("FileRead", "ERROR");
+    }
+}
 
 
