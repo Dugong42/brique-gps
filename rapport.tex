@@ -36,14 +36,14 @@
   %basicstyle=\ttfamily\footnotesize,
   %commentstyle=\color{Green}\scriptsize, % white comments
   %keywordstyle=\bfseries,
-        %keywordstyle=\color{Blue}\textnormal,
-        keywordstyle=\bfseries\ttfamily\color[rgb]{0,0,1},
-        identifierstyle=\ttfamily,
-        commentstyle=\color[rgb]{0.133,0.545,0.133},
-        stringstyle=\ttfamily\color[rgb]{0.627,0.126,0.941},
-        showstringspaces=false,
-        basicstyle=\small,
-        numberstyle=\footnotesize,
+	%keywordstyle=\color{Blue}\textnormal,
+	keywordstyle=\bfseries\ttfamily\color[rgb]{0,0,1},
+	identifierstyle=\ttfamily,
+	commentstyle=\color[rgb]{0.133,0.545,0.133},
+	stringstyle=\ttfamily\color[rgb]{0.627,0.126,0.941},
+	showstringspaces=false,
+	basicstyle=\small,
+	numberstyle=\footnotesize,
   title=\lstname, %afficher le titre
   frame=shadowbox, % le cadre
   captionpos=b, %légende en dessous
@@ -108,7 +108,65 @@ L'ensemble fonctionne sur pile. Au demarrage du boitier, la batterie s'affiche s
 	\label{sequence}
 \end{figure}
 
-\section{Algorithme}
+\section{Fonctionnement du programme}
+
+\subsection{Fonctionnement général}
+
+L'affichage sur écran LCD, le système de navigation, la sauvegarde sur carte SD et la récupération des données du module GPS sont tous géré par des classes séparées.
+La boucle principale ne fait qu'appeler les fonctions des instances de ces classes dans l'ordre. Cette boucle principale gère aussi le fonctionnement des boutons.
+A chaque passage dans la boucle le système teste si un des boutons à été appuyé et suivant quel bouton a été appuyé il lance la methode indiqué.
+
+\subsection{Gestion du GPS}
+
+Le module GPS est géré par la classe GPShandler.
+La fonction principale de cette classe est \emph{refreshData}.
+Cette fonction récupère les informations du modules GPS grace à une liaison série et la fonction \emph{encode}.
+Une boucle permet de récuperer tous les caractères qui arrivent de la liaison série.
+La fontion \emph{encode} permet de tester si toute la trame est arrivé, en effet elle ne renvera vrai que si elle arrive à décoder la trame. Sinon la trame n'est pas complète on continue de tourner dans la boucle.
+
+Lorsque toute la trame est arrivé, on met à jour ses attributs privés \emph{\_lat}, \emph{\_lon}, \emph{\_date}, \emph{\_time} et \emph{\_speed}.
+Pour gérer les problèmes dans la transmission, un \emph{timeout} permet d'arreter la boucle si la transmission prend trop de temps.
+
+
+\begin{lstlisting}[caption={resfreshData},label={refreshData}]
+// Information refreshing
+void GPShandler::refreshData(LCDhandler & lcd) {
+    unsigned long timer;
+
+    if (_isRunning && _nss.available()) {
+        // Serial Link UP
+        timer = millis();
+        do {
+            // We try to read a full message, handling transmission timeout in
+            // case of communication problems.
+            int answer = _nss.read();
+
+            // is the message fully received?
+            _isReceived = _gps.encode(answer);
+
+            if (_isReceived) {
+                _gps.get_position(&_lat, &_lon, &_fixAge);
+                // Time format: hhmmsscc
+                // Date format: jjmmaa
+                _gps.get_datetime(&_date, &_time, &_fixAge);
+
+                // Converting speed
+                _speed = _gps.speed() * KNOT_CONV;
+
+                // Stats : nb chars fed to the gps / nb sentences processed / nb failed checksum tests
+                _gps.stats(&_chars, &_sentences, &_failed_checksum);
+            }
+        } while (_nss.available() && !_isReceived && (millis()-timer < TIMEOUT));
+        if (millis()-timer > TIMEOUT)
+            lcd.notify("Timeout", "ERR");
+    }
+}
+\end{lstlisting}
+
+Par ailleurs, on dispose des methodes permettant de récuperer ces valeur. La boucle principale appelle donc à chaque passage \emph{refreshData} et on utilise les fonctions \emph{get}
+pour récupérer les dernières valeurs mises à jour.
+
+\subsection{Gestion du LCD}
 
 
 \end{document}
