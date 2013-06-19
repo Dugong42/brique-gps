@@ -51,6 +51,7 @@ char* MSG_MENUS[6]={"Distance", "Position", "Vitesse", "Stats", "LoopRate", "Tem
 LCDhandler lcd;
 GPShandler gps;
 SDhandler sdCard;
+SoftwareSerial ss(RXPIN,TXPIN);
 NavHandler nav(gps);
 
 // Declaration of used variables
@@ -71,12 +72,16 @@ void setup() {
     pinMode(10, OUTPUT);
     affichage = 1;
     sdCard.init();
-    
+
     //analogReag return an int between 0 and 1023
     voltage = analogRead(VOLTPIN);
     //Affiche en pourcentage si je me rapelle de ma règle de 3
+
     char* batteryLvl = strcat((char*)(voltage*3300/1023),"mV");
     
+    // init serial connexion
+    ss.begin(9600);
+
     // I'm always ready for you bro
     lcd.notify(batteryLvl, "READY");
 }

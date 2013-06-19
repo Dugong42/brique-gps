@@ -45,7 +45,7 @@
 	basicstyle=\small,
 	numberstyle=\footnotesize,
   title=\lstname, %afficher le titre
-  frame=shadowbox, % le cadre
+  frame=leftline, % le cadre
   captionpos=b, %légende en dessous
   numbers=left, %pour rajouter des numéros de ligne
   stepnumber=5, %définition du pas pour les numéros
@@ -66,6 +66,8 @@
 
 \maketitle
 
+\tableofcontents
+
 \newpage
 
 \section{Présentation du projet}
@@ -76,6 +78,7 @@ Notre boitier récupère les informations envoyées par le module GPS et les sto
 Ces fichiers peuvent ensuite être récuperés sur un PC pour être utilisés avec GPSprune, un logiciel permettant d'afficher
 le parcours correspondant aux données envoyées.
 
+\medskip
 Un premier bouton permet de demarrer ou d'arreter le parcours. Chaque nouveau redemarage créé un nouveau fichier où enregistrer les données.
 Chaque parcours est donc enregistré dans un fichier separé. On peut également mettre le parcours sur pause et le redemmarer ensuite, sans changer de parcours.
 
@@ -168,5 +171,87 @@ pour récupérer les dernières valeurs mises à jour.
 
 \subsection{Gestion du LCD}
 
+Le LCD est geré par la classe \emph{LCDHandler}. Les différentes méthodes servent à faire de la mise en forme et afficher de manière claire les informations.
+Par exemple la fonction \emph{notify} permet d'afficher pendant quelques secondes une information particulière sur deux lignes.
+
+\begin{lstlisting}[caption={notify}, label={notify}]
+void LCDhandler::notify(String s, String type) {
+    cls();
+    _lcd.print("[" + type + "]");
+    _lcd.setCursor(0, 1);
+    _lcd.print(s);
+
+    // "A while"
+    _isAvailable = false;
+    _time = millis();
+}
+
+\end{lstlisting}
+
+\subsection{Gestion de la carte SD}
+
+Toute la gestion de la carte SD se trouve dans la classe \emph{SDhandler}.
+L'initialisation de la carte se trouve dans la methode init et non pas dans le constructeur pour des raisons d'initialisation de la mémoire.
+
+Le système enregistre chaque parcours dans un fichier différent dont le nom est incrémental (gpslog01.txt, gpslog02.txt, etc). 
+Pour savoir quel est le fichier à utiliser, notamment lorsque l'on redemarre le sytème, un autre fichier contient le numero du fichier à utiliser.
+Ce fichier est créé s'il n'existe pas, sinon une seule valeur est écrite dedans à chaque changement de fichier.
+
+En plus de la methode d'initialisation, la classe à deux methodes : \emph{writeCoordinates} et \emph{changeFile}.
+La première écrit dans le fichier courant les valeures passées en paramètres et la deuxième change de fichier (et met à jour le fichier de numérotation donc).
+On appelera cette dernière méthode lorsque l'on stoppe un parcours.
+
+
+\begin{lstlisting}[caption={changeFile}, label={changeFile}]
+/**
+ *@fn void SDhandler::changeFileName()
+ *@brief Increment the name of the file and create it
+ */
+int SDhandler::changeFile() {
+
+    _logFile.close();
+
+    _numFile = _numFile + 1;
+    sprintf (_nameFile ,"gpslog%d.txt", _numFile);
+
+    _lastFile = SD.open("lastfile", FILE_WRITE);
+    _lastFile.seek(0);
+    _lastFile.write(_numFile);
+    _lastFile.close();
+
+    _logFile = SD.open(_nameFile, FILE_WRITE);
+    if (!_logFile.println ("latitude;longitude;date;time;speed;"))
+        return errWrite;
+    return 1;
+
+}
+\end{lstlisting}
+
+\section{Mode d'emploi}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{brique_dessin.png}
+	\caption{Schéma de la brique}
+	\label{brique_dessin}
+\end{figure}
+
+La brique se présente sous un boitier doté d'un switch sur le coté, un écran LCD et quatres boutons, qu'on nommera bouton 1, 2, 3 et 4.
+
+\bigskip
+Le switch fais passer le circuit sur un fonctionnement par pile. L'allumant à l'occasion s'il n'est pas branché.
+
+Une première pression sur le bouton 1 lance la capture de donnée. Une deuxième pression le met en pause. Appuyer longuement sur le bouton arrête la capture.
+
+Chaque pression sur le bouton 2 fait defiler l'affichage. Dans l'ordre, l'ecran affiche : 
+\begin{itemize}
+\item La distance parcourue
+\item Les coordonnées
+\item la vitesse
+\end{itemize}
+
+Le bouton 3 permet de changer le mode de capture.
+
+Le bouton 4 ne permet rien. Rien ! RIEN !
 
 \end{document}
