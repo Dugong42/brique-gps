@@ -51,7 +51,7 @@ const char* MSG_MENUS[6]={"Distance", "Position", "Vitesse", "Stats", "LoopRate"
 LCDhandler lcd;
 GPShandler gps;
 SDhandler sdCard;
-//NavHandler nav(gps);
+NavHandler nav(gps);
 
 // Declaration of used variables
 unsigned long timer;
@@ -75,7 +75,7 @@ void setup() {
     //analogReag return an int between 0 and 1023
     voltage = analogRead(VOLTPIN);
     //Affiche en pourcentage si je me rapelle de ma règle de 3
-    String batteryLvl = String(voltage*3.3/1023) + "%";
+    String batteryLvl = String(voltage*3300/1023) + "mV";
     
     // I'm always ready for you bro
     lcd.notify(batteryLvl, "READY");
@@ -232,6 +232,7 @@ void loop() {
     handleButtons();
     printInfos();
     gps.refreshData(lcd);
+    nav.render();
 
     // Estimate the time spent for CYCLE_NUMBER loops
     meanTick=(meanTick+1)%CYCLE_NUMBER;
