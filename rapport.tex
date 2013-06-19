@@ -45,7 +45,7 @@
 	basicstyle=\small,
 	numberstyle=\footnotesize,
   title=\lstname, %afficher le titre
-  frame=shadowbox, % le cadre
+  frame=leftline, % le cadre
   captionpos=b, %légende en dessous
   numbers=left, %pour rajouter des numéros de ligne
   stepnumber=5, %définition du pas pour les numéros
@@ -66,6 +66,8 @@
 
 \maketitle
 
+\tableofcontents
+
 \newpage
 
 \section{Présentation du projet}
@@ -76,6 +78,7 @@ Notre boitier récupère les informations envoyées par le module GPS et les sto
 Ces fichiers peuvent ensuite être récuperés sur un PC pour être utilisés avec GPSprune, un logiciel permettant d'afficher
 le parcours correspondant aux données envoyées.
 
+\medskip
 Un premier bouton permet de demarrer ou d'arreter le parcours. Chaque nouveau redemarage créé un nouveau fichier où enregistrer les données.
 Chaque parcours est donc enregistré dans un fichier separé. On peut également mettre le parcours sur pause et le redemmarer ensuite, sans changer de parcours.
 
@@ -224,6 +227,31 @@ int SDhandler::changeFile() {
 }
 \end{lstlisting}
 
+\section{Mode d'emploi}
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{brique_dessin.png}
+	\caption{Schéma de la brique}
+	\label{brique_dessin}
+\end{figure}
+
+La brique se présente sous un boitier doté d'un switch sur le coté, un écran LCD et quatres boutons, qu'on nommera bouton 1, 2, 3 et 4.
+
+\bigskip
+Le switch fais passer le circuit sur un fonctionnement par pile. L'allumant à l'occasion s'il n'est pas branché.
+
+Une première pression sur le bouton 1 lance la capture de donnée. Une deuxième pression le met en pause. Appuyer longuement sur le bouton arrête la capture.
+
+Chaque pression sur le bouton 2 fait defiler l'affichage. Dans l'ordre, l'ecran affiche : 
+\begin{itemize}
+\item La distance parcourue
+\item Les coordonnées
+\item la vitesse
+\end{itemize}
+
+Le bouton 3 permet de changer le mode de capture.
+
+Le bouton 4 ne permet rien. Rien ! RIEN !
 
 \end{document}
