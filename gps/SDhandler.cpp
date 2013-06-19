@@ -57,7 +57,6 @@ int SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
     char logEntry[LOGENTRY_SIZE];
 
     sprintf(logEntry, "%f;%f;%f;%f;%f;", lat, lon, gspeed, date, time);
-    strcat(_buffer, logEntry);
     if (!_logFile.println (logEntry))
         return errWrite;
     _logFile.flush();

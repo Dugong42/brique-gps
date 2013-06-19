@@ -168,5 +168,62 @@ pour récupérer les dernières valeurs mises à jour.
 
 \subsection{Gestion du LCD}
 
+Le LCD est geré par la classe \emph{LCDHandler}. Les différentes méthodes servent à faire de la mise en forme et afficher de manière claire les informations.
+Par exemple la fonction \emph{notify} permet d'afficher pendant quelques secondes une information particulière sur deux lignes.
+
+\begin{lstlisting}[caption={notify}, label={notify}]
+void LCDhandler::notify(String s, String type) {
+    cls();
+    _lcd.print("[" + type + "]");
+    _lcd.setCursor(0, 1);
+    _lcd.print(s);
+
+    // "A while"
+    _isAvailable = false;
+    _time = millis();
+}
+
+\end{lstlisting}
+
+\subsection{Gestion de la carte SD}
+
+Toute la gestion de la carte SD se trouve dans la classe \emph{SDhandler}.
+L'initialisation de la carte se trouve dans la methode init et non pas dans le constructeur pour des raisons d'initialisation de la mémoire.
+
+Le système enregistre chaque parcours dans un fichier différent dont le nom est incrémental (gpslog01.txt, gpslog02.txt, etc). 
+Pour savoir quel est le fichier à utiliser, notamment lorsque l'on redemarre le sytème, un autre fichier contient le numero du fichier à utiliser.
+Ce fichier est créé s'il n'existe pas, sinon une seule valeur est écrite dedans à chaque changement de fichier.
+
+En plus de la methode d'initialisation, la classe à deux methodes : \emph{writeCoordinates} et \emph{changeFile}.
+La première écrit dans le fichier courant les valeures passées en paramètres et la deuxième change de fichier (et met à jour le fichier de numérotation donc).
+On appelera cette dernière méthode lorsque l'on stoppe un parcours.
+
+
+\begin{lstlisting}[caption={changeFile}, label={changeFile}]
+/**
+ *@fn void SDhandler::changeFileName()
+ *@brief Increment the name of the file and create it
+ */
+int SDhandler::changeFile() {
+
+    _logFile.close();
+
+    _numFile = _numFile + 1;
+    sprintf (_nameFile ,"gpslog%d.txt", _numFile);
+
+    _lastFile = SD.open("lastfile", FILE_WRITE);
+    _lastFile.seek(0);
+    _lastFile.write(_numFile);
+    _lastFile.close();
+
+    _logFile = SD.open(_nameFile, FILE_WRITE);
+    if (!_logFile.println ("latitude;longitude;date;time;speed;"))
+        return errWrite;
+    return 1;
+
+}
+\end{lstlisting}
+
+
 
 \end{document}
