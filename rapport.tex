@@ -1,18 +1,3 @@
-%
-% tp1.tex
-%
-% auteurs: Paul Chabanon (PC) et Antoine Guerrée (AG)
-% créé le: 2013-06-01
-% dernière mise-à-jour: 2013-06-01
-%
-% Description:
-% Fichier principal du document. Contient les commandes LaTeX nécessaires,
-% et inclus les autres fichiers nécessaires au rapport.
-% Pour compiler ce document, les packages texlive et texlive-lang-french
-% texlive-latex-extra sont recommandés.
-%
-
-
 %% En-tête
 \documentclass[a4paper,12pt,titlepage]{article}
 \usepackage[french]{babel}
@@ -72,23 +57,38 @@
 
 \section{Présentation du projet}
 
-Le but du projet était de créer le programme tournant sur un micro-contrôleur Arduino permettant de manipuler des données GPS.
+\subsection{Le travail réalisé}
+
+Le but du projet était de créer le programme tournant sur un microcontrôleur Arduino permettant de manipuler des données GPS.
 
 Notre boitier récupère les informations envoyées par le module GPS et les stockent sur une carte SD dans des fichiers. 
-Ces fichiers peuvent ensuite être récuperés sur un PC pour être utilisés avec GPSprune, un logiciel permettant d'afficher
+Ces fichiers peuvent ensuite être récupérés sur un PC pour être utilisés avec GPSprune, un logiciel permettant d'afficher
 le parcours correspondant aux données envoyées.
 
-\medskip
-Un premier bouton permet de demarrer ou d'arreter le parcours. Chaque nouveau redemarage créé un nouveau fichier où enregistrer les données.
-Chaque parcours est donc enregistré dans un fichier separé. On peut également mettre le parcours sur pause et le redemmarer ensuite, sans changer de parcours.
-
+\bigskip
+Un premier bouton permet de démarrer ou d'arrêter le parcours. Chaque nouveau redémarrage créé un nouveau fichier où enregistrer les données.
+Chaque parcours est donc enregistré dans un fichier séparé. On peut également mettre le parcours sur pause et le redémarrer ensuite, sans changer de parcours.
+\\
 Le boitier dispose d'un écran LCD qui permet d'afficher plusieurs informations. En appuyant sur un deuxième bouton on change l'affichage.
-L'écran peut afficher les coordonnées, la vitesse, la distance parcourue ou l'heure. Toutes ces informations sont bien evidement mises à jour en temps réel.
-
+L'écran peut afficher les coordonnées, la vitesse, la distance parcourue ou l'heure. Toutes ces informations sont bien évidement mises à jour en temps réel.
+\\
 Un autre bouton permet de choisir le mode d'enregistrement : soit les points sont enregistrés suivant un temps fixe (toutes les trois secondes),
 soit les points sont enregistrés suivant leur distance avec le point d'avant. Nous obtenons ainsi une suite de point qui ne sont pas identiques.
+\\
+L'ensemble fonctionne sur pile. Au démarrage du boitier, la batterie s'affiche sur l'écran LCD.
 
-L'ensemble fonctionne sur pile. Au demarrage du boitier, la batterie s'affiche sur l'écran LCD.
+\subsection{Mathématiques appliquées}
+
+Pour calculer la distance entre deux points, on utilise la formule de Vincenty.
+Il s'agit d'une méthode itérative pour calculer la distance entre deux points à la surface d'un sphéroïde.
+Cette formule utilise l'hypothèse que la Terre est un sphéroïde aplati aux pôles, ce qui les rend plus précise que d’autres méthodes qui considèrent la terre comme parfaitement sphérique.
+
+
+
+\subsection{Contraintes}
+
+Nous avons atteint les limites de la mémoire de l'Arduino. Il a donc fallu réduire au maximum l'empreinte mémorielle de notre programme.
+Nous avons tout d'abord dû supprimer les classes superflues. Tout d'abord String, en utilisant à la place des chaînes de caractère de la bonne taille.
 
 
 \section{UML}
@@ -117,18 +117,18 @@ L'ensemble fonctionne sur pile. Au demarrage du boitier, la batterie s'affiche s
 
 L'affichage sur écran LCD, le système de navigation, la sauvegarde sur carte SD et la récupération des données du module GPS sont tous géré par des classes séparées.
 La boucle principale ne fait qu'appeler les fonctions des instances de ces classes dans l'ordre. Cette boucle principale gère aussi le fonctionnement des boutons.
-A chaque passage dans la boucle le système teste si un des boutons à été appuyé et suivant quel bouton a été appuyé il lance la methode indiqué.
+A chaque passage dans la boucle le système teste si un des boutons à été appuyé et suivant quel bouton a été appuyé il lance la méthode indiqué.
 
 \subsection{Gestion du GPS}
 
 Le module GPS est géré par la classe GPShandler.
 La fonction principale de cette classe est \emph{refreshData}.
-Cette fonction récupère les informations du modules GPS grace à une liaison série et la fonction \emph{encode}.
-Une boucle permet de récuperer tous les caractères qui arrivent de la liaison série.
-La fontion \emph{encode} permet de tester si toute la trame est arrivé, en effet elle ne renvera vrai que si elle arrive à décoder la trame. Sinon la trame n'est pas complète on continue de tourner dans la boucle.
+Cette fonction récupère les informations du modules GPS grâce à une liaison série et la fonction \emph{encode}.
+Une boucle permet de récupérer tous les caractères qui arrivent de la liaison série.
+La fonction \emph{encode} permet de tester si toute la trame est arrivé, en effet elle ne renverra vrai que si elle arrive à décoder la trame. Sinon la trame n'est pas complète on continue de tourner dans la boucle.
 
 Lorsque toute la trame est arrivé, on met à jour ses attributs privés \emph{\_lat}, \emph{\_lon}, \emph{\_date}, \emph{\_time} et \emph{\_speed}.
-Pour gérer les problèmes dans la transmission, un \emph{timeout} permet d'arreter la boucle si la transmission prend trop de temps.
+Pour gérer les problèmes dans la transmission, un \emph{timeout} permet d'arrêter la boucle si la transmission prend trop de temps.
 
 
 \begin{lstlisting}[caption={resfreshData},label={refreshData}]
@@ -166,12 +166,12 @@ void GPShandler::refreshData(LCDhandler & lcd) {
 }
 \end{lstlisting}
 
-Par ailleurs, on dispose des methodes permettant de récuperer ces valeur. La boucle principale appelle donc à chaque passage \emph{refreshData} et on utilise les fonctions \emph{get}
+Par ailleurs, on dispose des méthodes permettant de récupérer ces valeurs. La boucle principale appelle donc à chaque passage \emph{refreshData} et on utilise les fonctions \emph{get}
 pour récupérer les dernières valeurs mises à jour.
 
 \subsection{Gestion du LCD}
 
-Le LCD est geré par la classe \emph{LCDHandler}. Les différentes méthodes servent à faire de la mise en forme et afficher de manière claire les informations.
+Le LCD est géré par la classe \emph{LCDHandler}. Les différentes méthodes servent à faire de la mise en forme et afficher de manière claire les informations.
 Par exemple la fonction \emph{notify} permet d'afficher pendant quelques secondes une information particulière sur deux lignes.
 
 \begin{lstlisting}[caption={notify}, label={notify}]
@@ -191,15 +191,15 @@ void LCDhandler::notify(String s, String type) {
 \subsection{Gestion de la carte SD}
 
 Toute la gestion de la carte SD se trouve dans la classe \emph{SDhandler}.
-L'initialisation de la carte se trouve dans la methode init et non pas dans le constructeur pour des raisons d'initialisation de la mémoire.
+L'initialisation de la carte se trouve dans la méthode init et non pas dans le constructeur pour des raisons d'initialisation de la mémoire.
 
 Le système enregistre chaque parcours dans un fichier différent dont le nom est incrémental (gpslog01.txt, gpslog02.txt, etc). 
-Pour savoir quel est le fichier à utiliser, notamment lorsque l'on redemarre le sytème, un autre fichier contient le numero du fichier à utiliser.
+Pour savoir quel est le fichier à utiliser, notamment lorsque l'on redémarre le système, un autre fichier contient le numéro du fichier à utiliser.
 Ce fichier est créé s'il n'existe pas, sinon une seule valeur est écrite dedans à chaque changement de fichier.
 
 En plus de la methode d'initialisation, la classe à deux methodes : \emph{writeCoordinates} et \emph{changeFile}.
-La première écrit dans le fichier courant les valeures passées en paramètres et la deuxième change de fichier (et met à jour le fichier de numérotation donc).
-On appelera cette dernière méthode lorsque l'on stoppe un parcours.
+La première écrit dans le fichier courant les valeurs passées en paramètres et la deuxième change de fichier (et met à jour le fichier de numérotation donc).
+On appellera cette dernière méthode lorsque l'on stoppe un parcours.
 
 
 \begin{lstlisting}[caption={changeFile}, label={changeFile}]
@@ -236,22 +236,23 @@ int SDhandler::changeFile() {
 	\label{brique_dessin}
 \end{figure}
 
-La brique se présente sous un boitier doté d'un switch sur le coté, un écran LCD et quatres boutons, qu'on nommera bouton 1, 2, 3 et 4.
+La brique se présente sous un boitier doté d'un switch sur le côté, un écran LCD et quatre boutons, qu'on nommera bouton 1, 2, 3 et 4.
 
 \bigskip
-Le switch fais passer le circuit sur un fonctionnement par pile. L'allumant à l'occasion s'il n'est pas branché.
+Le switch fait passer le circuit sur un fonctionnement par pile. L'allumant à l'occasion s'il n'est pas branché.
 
 Une première pression sur le bouton 1 lance la capture de donnée. Une deuxième pression le met en pause. Appuyer longuement sur le bouton arrête la capture.
 
-Chaque pression sur le bouton 2 fait defiler l'affichage. Dans l'ordre, l'ecran affiche : 
+Chaque pression sur le bouton 2 fait défiler l'affichage. Dans l'ordre, l'écran affiche : 
 \begin{itemize}
 \item La distance parcourue
 \item Les coordonnées
 \item la vitesse
 \end{itemize}
 
-Le bouton 3 permet de changer le mode de capture.
+Le bouton 3 permet de changer le mode de capture. Il y a deux modes, toutes les trois secondes et lorsque la distance entre les deux derniers points est assez importante.
+Par défaut le boitier enregistre toutes les trois secondes.
 
-Le bouton 4 ne permet rien. Rien ! RIEN !
+Le bouton 4 ne permet de transférer les fichiers du boitier vers le PC.
 
 \end{document}
