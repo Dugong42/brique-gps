@@ -36,9 +36,9 @@ int SDhandler::init() {
         char buffer[10];
         int i=0;
         do {
-          buffer[i] = _lastFile.read();
-          i++;
-        }while (buffer[i-1]!=-1)
+            buffer[i] = _lastFile.read();
+            i++;
+        }while (buffer[i-1]!=-1);
         _numFile = (int)strtol(buffer, NULL, 10);
         _lastFile.close();
         _numFile = _numFile + 1;
@@ -88,7 +88,7 @@ int SDhandler::changeFile() {
     _lastFile.close();
 
     _logFile = SD.open(_nameFile, FILE_WRITE);
-//    _lastFile.seek(0);
+    //    _lastFile.seek(0);
     _logFile.println("latitude;longitude;date;time;speed;");
     _logFile.close();
     return 1;
