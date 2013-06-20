@@ -25,6 +25,8 @@ LCDhandler::LCDhandler() : _lcd(
     _isAvailable = true;
     // Enable autoscroll for strings > LCDC
     //_lcd.autoscroll();
+    //_lcd.print("boo");
+    //printline("tutu",0);
 }
 
 // PROCEDURE
@@ -50,7 +52,7 @@ void LCDhandler::cls(int line) {
 // Clear end of line
 // String lendth must be < LCDC
 // Line must is numbered from 0 to LCDR
-void LCDhandler::printline(char* s, int line) {
+void LCDhandler::printline(char s[16], int line) {
     checkAvailable();
 
     // Check params
@@ -71,9 +73,10 @@ void LCDhandler::printline(char* s, int line) {
 // PROCEDURE
 // Notify user with for a while
 // ERR, INFO, WARN
-void LCDhandler::notify(char* s, char* type) {
-    _lcd.clear();
+void LCDhandler::notify(char s[16], char type[16]) {
+    cls(0);
     _lcd.print(type);
+    cls(1);
     _lcd.setCursor(0, 1);
     _lcd.print(s);
 
@@ -84,7 +87,7 @@ void LCDhandler::notify(char* s, char* type) {
 
 // PROCEDURE
 // Notify user with no notification type
-void LCDhandler::notify(char* s) {
+void LCDhandler::notify(char s[16]) {
     notify(s, "GPS");
 }
 

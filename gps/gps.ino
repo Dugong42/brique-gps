@@ -24,8 +24,6 @@
 const int BUT3  = 17;
 const int BUT2  = 16;
 const int BUT1  = 15;
-const int RXPIN = 3;
-const int TXPIN = 2;
 const int VOLTPIN = 15;
 
 // Delay to press button to reset
@@ -33,9 +31,6 @@ const int RSTDELAY = 2000;
 
 // Delay min between 2 button pressures
 const unsigned long DELAYBUTTON = 250;
-
-// Nautical mile per hour (knot) in meters per second (m/s)
-const double KNOT_CONV = 0.514444444;
 
 // Number of cycles to do the refresh rate mean on
 const int CYCLE_NUMBER = 100;
@@ -49,7 +44,6 @@ char* MSG_MODS[3]={"Temps","Distance","Combo"};
 LCDhandler lcd;
 GPShandler gps;
 SDhandler sdCard;
-//SoftwareSerial ss(RXPIN,TXPIN);
 NavHandler nav(gps);
 
 // Declaration of used variables
@@ -63,24 +57,29 @@ int voltage;
 // FUNCTION
 // Initialisation
 void setup() {
+
+    lcd.printline("1",0);
+    delay(500);
+    
     timer=millis();
     curTimer=millis();
     prevTimer=curTimer;
-
     pinMode(10, OUTPUT);
     affichage = 1;
     sdCard.init();
-
+    
+    lcd.printline("3",0);
+    delay(500);
+    
     //analogReag return an int between 0 and 1023
     voltage = analogRead(VOLTPIN);
     //Affiche en pourcentage si je me rapelle de ma règle de 3
-
-    char* batteryLvl;
-    sprintf(batteryLvl, "%d mv", voltage*3300/1023);
+    char batteryLvl[16];
+    sprintf(batteryLvl, "%d mv\0", (voltage*3300)/1023);
     
-    // init serial connexion
-    //ss.begin(9600);
-
+    lcd.printline("4",0);
+    delay(500);
+    
     // I'm always ready for you bro
     lcd.notify(batteryLvl, "READY");
 }
@@ -112,19 +111,19 @@ int demuxButtons() {
 }
 
 char* ulToChar(unsigned long nb){
-    char* ch; 
+    char ch[32]; 
     sprintf(ch,"%lu",nb);
     return ch;
 }
 
 char* lToChar( long nb){
-    char* ch; 
+    char ch[32]; 
     sprintf(ch,"%ld",nb);
     return ch;
 }
 
 char* usToChar( unsigned short nb){
-    char* ch; 
+    char ch[32]; 
     sprintf(ch,"%hu",nb);
     return ch;
 }

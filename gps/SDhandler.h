@@ -8,7 +8,6 @@
 #define errWrite     -2
 
 //Définition de constantes
-#define BUFFER_SIZE     4096
 #define LOGENTRY_SIZE   128
 #define WRITE_DELAY     2000
 #define NAMESIZE        13
@@ -19,7 +18,6 @@ class SDhandler {
         File _logFile;
         File _lastFile;
         unsigned long _timerSD;
-        char _buffer[];
 
     public :
         SDhandler();
