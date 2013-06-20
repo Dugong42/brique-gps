@@ -15,6 +15,7 @@ class NavHandler {
         long _start_lat, _start_lon;
         unsigned long _path_distance;
         unsigned long _speed;
+        unsigned long _speedTimer;
 
         unsigned long difference();
         unsigned long distance_between(long lat1, long lat2, long lon1, long lon2);

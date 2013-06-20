@@ -23,10 +23,6 @@ LCDhandler::LCDhandler() : _lcd(
     // Init LCD size
     _lcd.begin(LCDC, LCDR);
     _isAvailable = true;
-    // Enable autoscroll for strings > LCDC
-    //_lcd.autoscroll();
-    //_lcd.print("boo");
-    //printline("tutu",0);
 }
 
 // PROCEDURE
@@ -52,7 +48,7 @@ void LCDhandler::cls(int line) {
 // Clear end of line
 // String lendth must be < LCDC
 // Line must is numbered from 0 to LCDR
-void LCDhandler::printline(char s[16], int line) {
+void LCDhandler::printline(char* s, int line) {
     checkAvailable();
 
     // Check params
@@ -70,11 +66,30 @@ void LCDhandler::printline(char s[16], int line) {
     }
 }
 
+void LCDhandler::tprint(unsigned long nb, int line){
+    char ch[16]; 
+    sprintf(ch,"%lu",nb);
+    printline(ch,line);
+}
+
+void LCDhandler::tprint( long nb, int line){
+    char ch[16]; 
+    sprintf(ch,"%ld",nb);
+    printline(ch,line);
+}
+
+void LCDhandler::tprint( unsigned short nb, int line){
+    char ch[16]; 
+    sprintf(ch,"%hu",nb);
+    printline(ch,line);
+}
+
 // PROCEDURE
 // Notify user with for a while
 // ERR, INFO, WARN
 void LCDhandler::notify(char s[16], char type[16]) {
     cls(0);
+    _lcd.home();
     _lcd.print(type);
     cls(1);
     _lcd.setCursor(0, 1);

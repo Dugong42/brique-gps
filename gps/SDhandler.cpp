@@ -10,7 +10,6 @@
 //Constructor
 SDhandler::SDhandler() {
     _nameFile[NAMESIZE];
-    _buffer[BUFFER_SIZE];
 }
 
 // METHOD

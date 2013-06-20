@@ -12,10 +12,13 @@ class LCDhandler {
 
     public:
         LCDhandler();
-        void printline(char s[], int line);
+        void printline(char* s, int line);
         void cls();
         void cls(int line);
-        void notify(char s[]);
-        void notify(char s[], char type[]);
+        void notify(char* s);
+        void notify(char* s, char* type);
+        void tprint(unsigned long nb, int line);
+        void tprint( long nb, int line);
+        void tprint( unsigned short nb, int line);
 };
 #endif

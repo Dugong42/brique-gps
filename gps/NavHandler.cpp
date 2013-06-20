@@ -18,6 +18,7 @@ NavHandler::NavHandler(GPShandler & gps) :
     _gps=gps;
     _sdCard.init();
     _writeTimer=millis();
+    _speedTimer=_writeTimer;
     setMod(2);
 }
 
@@ -74,20 +75,32 @@ void NavHandler::setMod(int mod) {
 
 void NavHandler::render() {
     // Do navigation-related work here
-    unsigned long _diff = difference();
-    if ( _diff>=1000 && millis()-_writeTimer >= write_delay) {
-        sdWrite();
-        _lat = _gps.getLat();
-        _lon = _gps.getLon();
-        _speed = _diff/(millis()-_writeTimer);
-        if (_reset){
-            _start_lat=_lat;
-            _start_lon=_lon;
-            _reset = false;
-        }else{ //Avoids recording the first position shift
-            _path_distance+=_diff;
-        }
-        _writeTimer=millis();
+    if (_gps.isRunning()){
+      
+      unsigned long _diff = difference();
+
+      
+      
+      if ( _diff>=1000 && millis()-_writeTimer >= write_delay) {
+          sdWrite();
+          
+          if (millis()-_speedTimer>=1000){
+            _speed = _diff/(millis()-_speedTimer);
+            _speedTimer=millis();
+          }
+      
+          _lat = _gps.getLat();
+          _lon = _gps.getLon();
+          
+          if (_reset){
+              _start_lat=_lat;
+              _start_lon=_lon;
+              _reset = false;
+          }else{ //Avoids recording the first position shift
+              _path_distance+=_diff;
+          }
+          _writeTimer=millis();
+      }
     }
 }
 
