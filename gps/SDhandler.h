@@ -27,10 +27,10 @@ class SDhandler {
 
     public :
         SDhandler();
-        int init();
-        int writeCoordinates (long lat, long lon, unsigned long date,
+        void init();
+        void writeCoordinates (long lat, long lon, unsigned long date,
                 unsigned long time, unsigned long gspeed);
-        int changeFile();
+        void changeFile();
         void dumpFile(LCDhandler lcd, char* filename);
 };
 #endif

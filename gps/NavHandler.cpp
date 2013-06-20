@@ -88,9 +88,9 @@ void NavHandler::render(LCDhandler & lcd) {
     }
 }
 
-int NavHandler::sdWrite() {
+void NavHandler::sdWrite() {
     //return 0;
-    return sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(), gps.getTime(), gps.getSpeed());
+    sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(), gps.getTime(), gps.getSpeed());
 }
 
 // Distance between two given points

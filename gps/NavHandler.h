@@ -18,7 +18,7 @@ class NavHandler {
         int _write_space;
 
         unsigned long distance_between(long lat1, long lat2, long lon1, long lon2);
-        int sdWrite();
+        void sdWrite();
 
 
     public:

@@ -14,42 +14,16 @@ SDhandler::SDhandler() {
 
 // METHOD
 // Init SD
-int SDhandler::init() {
+void SDhandler::init() {
 
     // Init SD communication
     if (!SD.begin(CS)) {
-        return -3;
+        return;
     }
-    
-    strcpy (_nameFile, "GPS0.TXT");
+
+    strcpy(_nameFile, "GPS0.TXT");
     _logFile = SD.open(_nameFile, FILE_WRITE);
 
-//    //  Initialisation carte
-//    if (!SD.exists(".last")) {
-//        _lastFile = SD.open(".last", FILE_WRITE);
-//        _numFile=0;
-//        _lastFile.print(_numFile);
-//        strcpy (_nameFile, "GPS0.TXT");
-//    }
-//
-//    else {
-//        _lastFile = SD.open(".last", FILE_READ);
-//        char buffer[5];
-//        int i=-1;
-//        do {
-//            i++;
-//            buffer[i] = _lastFile.read();
-////        } while (buffer[i] != '-1');
-//        } while (i <= 4);
-//        buffer[i]='\0';
-//
-//        _numFile = (int)strtol(buffer, NULL, 10);
-//        _lastFile.close();
-//        _numFile = _numFile + 1;
-//        sprintf (_nameFile , "GPS%d.TXT", _numFile);
-//    }
-
-    return 0;
 }
 
 /**
@@ -65,15 +39,14 @@ int SDhandler::init() {
  *	   -1 si ne peut pas ouvrir le fichier
  *	   -2 si erreur ecriture
  */
-int SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
+void SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
         unsigned long time, unsigned long gspeed)
 {
-   // _logFile = SD.open(_nameFile, FILE_WRITE);
+    // _logFile = SD.open(_nameFile, FILE_WRITE);
     char logEntry[LOGENTRY_SIZE];
 
-    sprintf(logEntry, "%f;%f;%f;%f;%f;", lat, lon, gspeed, date, time);
-    if (!_logFile.println (logEntry))
-        return errWrite;
+    sprintf(logEntry, "%f;%f;%f;%f;%f;\n", lat, lon, gspeed, date, time);
+    _logFile.write(logEntry);
     _logFile.flush();
 }
 
@@ -81,26 +54,25 @@ int SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
  *@fn void SDhandler::changeFileName()
  *@brief Increment the name of the file and create it
  */
-int SDhandler::changeFile() {
+void SDhandler::changeFile() {
 
-      _logFile.println("\n");
-      _logFile.println("latitude;longitude;date;time;speed;");
-      _logFile.flush();
-      
-//    _numFile = _numFile + 1;
-//    sprintf (_nameFile ,"GPS%d.txt", _numFile);
-//
-//    _lastFile = SD.open(".last", FILE_WRITE);
-//    _lastFile.seek(0);
-//    _lastFile.print(_numFile, DEC);
-//    _lastFile.close();
-//
-//    _logFile = SD.open(_nameFile, FILE_WRITE);
-//    //    _lastFile.seek(0);
-//    _logFile.println("latitude;longitude;date;time;speed;");
-//    _logFile.close();
-//    return 1;
+    //    _logFile.print("\n");
+    _logFile.write("latitude;longitude;date;time;speed;\n");
+    _logFile.flush();
 
+    //    _numFile = _numFile + 1;
+    //    sprintf (_nameFile ,"GPS%d.txt", _numFile);
+    //
+    //    _lastFile = SD.open(".last", FILE_WRITE);
+    //    _lastFile.seek(0);
+    //    _lastFile.print(_numFile, DEC);
+    //    _lastFile.close();
+    //
+    //    _logFile = SD.open(_nameFile, FILE_WRITE);
+    //    //    _lastFile.seek(0);
+    //    _logFile.println("latitude;longitude;date;time;speed;");
+    //    _logFile.close();
+    //    return 1;
 }
 
 // PROCEDURE
