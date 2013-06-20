@@ -26,7 +26,7 @@ class NavHandler {
     public:
         NavHandler(GPShandler &);
         
-        unsigned long NavHandler::getSpeed();
+        unsigned long getSpeed();
         unsigned long getAbsoluteDistance();
         unsigned long getRouteDistance();
         void setMod(int mod);
