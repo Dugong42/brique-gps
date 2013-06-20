@@ -70,7 +70,7 @@ void LCDhandler::printline(char* s, int line) {
 
         for (int i=0; i < LCDC; i++)
             _lcd.print(" ");
-        
+
     }
 }
 
