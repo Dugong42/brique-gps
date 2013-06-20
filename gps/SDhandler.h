@@ -16,6 +16,7 @@
 class SDhandler {
     private :
         char _nameFile[];
+        unsigned long _timerSD;
 
     public :
         SDhandler();
