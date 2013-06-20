@@ -11,7 +11,6 @@
 //Constructor
 SDhandler::SDhandler() {
     _nameFile[NAMESIZE];
-    init();
 }
 
 // METHOD
@@ -24,21 +23,22 @@ int SDhandler::init() {
     }
 
     //  Initialisation carte
-    if (!SD.exists("lastfile.txt")) {
-        _lastFile = SD.open("lastfile.txt", FILE_WRITE);
+    if (!SD.exists(".last")) {
+        _lastFile = SD.open(".last", FILE_WRITE);
         _numFile=0;
         _lastFile.print(_numFile);
         strcpy (_nameFile, "GPS0.TXT");
     }
 
     else {
-        _lastFile = SD.open("lastfile.txt", FILE_READ);
+        _lastFile = SD.open(".last", FILE_READ);
         char buffer[5];
         int i=-1;
         do {
-          i++;
-          buffer[i] = _lastFile.read();
-        } while (buffer[i] != -1);
+            i++;
+            buffer[i] = _lastFile.read();
+//        } while (buffer[i] != '-1');
+        } while (i <= 4);
         buffer[i]='\0';
 
         _numFile = (int)strtol(buffer, NULL, 10);
@@ -84,7 +84,7 @@ int SDhandler::changeFile() {
     _numFile = _numFile + 1;
     sprintf (_nameFile ,"GPS%d.txt", _numFile);
 
-    _lastFile = SD.open("lastfile.txt", FILE_WRITE);
+    _lastFile = SD.open(".last", FILE_WRITE);
     _lastFile.seek(0);
     _lastFile.print(_numFile, DEC);
     _lastFile.close();

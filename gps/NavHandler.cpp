@@ -3,7 +3,7 @@
 #include "SDhandler.h"
 
 NavHandler::NavHandler() :
-    _sdCard(SDhandler()),
+    sdCard(SDhandler()),
     gps(GPShandler())
 {
     _write_delay=1000;
@@ -50,7 +50,7 @@ void NavHandler::reset(){
     _start_lat=gps.getLat();
     _start_lon=gps.getLon();
     gps.stop();
-    _sdCard.changeFile();
+    sdCard.changeFile();
 }
 
 // Other functions
@@ -90,7 +90,7 @@ void NavHandler::render(LCDhandler & lcd) {
 
 int NavHandler::sdWrite() {
     //return 0;
-    return _sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(), gps.getTime(), gps.getSpeed());
+    return sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(), gps.getTime(), gps.getSpeed());
 }
 
 // Distance between two given points
@@ -138,3 +138,4 @@ unsigned long NavHandler::distance_between(long lat1, long lon1, long lat2, long
 
     return (unsigned long)s*100; //returns distance in cm
 }
+

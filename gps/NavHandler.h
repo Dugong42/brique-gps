@@ -5,7 +5,6 @@
 
 class NavHandler {
     private:
-        SDhandler _sdCard;
 
         bool _reset;
         int _mod,_write_delay,_write_range;
@@ -26,6 +25,7 @@ class NavHandler {
         NavHandler();
 
         GPShandler gps;
+        SDhandler sdCard;
 
         void reset();
 
