@@ -40,7 +40,7 @@ int SDhandler::init() {
           buffer[i] = _lastFile.read();
         } while (buffer[i]!=-1);
         buffer[i]='\0';
-        
+
         _numFile = (int)strtol(buffer, NULL, 10);
         _lastFile.close();
         _numFile = _numFile + 1;
