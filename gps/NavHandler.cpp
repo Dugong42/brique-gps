@@ -7,15 +7,16 @@ NavHandler::NavHandler(/*GPShandler & gps*/) :
     gps(GPShandler())
     
 {
+    _write_space=5;
     _speed=0;
     _path_distance=0;
     _reset=true;
     _start_lat=0;
     _start_lon=0;
-    _lat=0;
-    _lon=0;
-    _lat_p=0;
-    _lon_p=0;
+    _speed_lat=0;
+    _speed_lon=0;
+    _rec_lon=0;
+    _rec_lat=0;
     _mod=0;
     gps=gps;
     _writeTimer=millis();
@@ -39,14 +40,11 @@ unsigned long NavHandler::getAbsoluteDistance() {
 }
 unsigned long NavHandler::getRouteDistance() { return _path_distance; }
 
-// Distance between the current location and the previous recorded
-unsigned long NavHandler::difference() {
-    return distance_between(_lat, _lon, gps.getLat(), gps.getLon());
-}
-
 void NavHandler::reset(){
     _reset=true;
     _path_distance=0;
+    _start_lat=gps.getLat();
+    _start_lon=gps.getLon();
     gps.stop();
     //_sdCard.changeFile();
 }
@@ -54,24 +52,7 @@ void NavHandler::reset(){
 unsigned long NavHandler::getSpeed(){ return _speed; }
 
 void NavHandler::setMod(int mod) {
-    switch(mod){
-        case 0:
-            _write_delay=3000;
-            _write_range=0;
-            break;
-        
-        case 1:
-            _write_delay=0;
-            _write_range=2000;
-            break;
-        
-        case 2:
-            _write_delay=1000;
-            _write_range=500;
-            break;
-        default:
-            break;
-    }
+    _write_space=mod;
 }
 
 void NavHandler::render(LCDhandler & lcd) {
@@ -80,30 +61,29 @@ void NavHandler::render(LCDhandler & lcd) {
   
     // Do navigation-related work here
     if (gps.isRunning()){
-      
-      unsigned long _diff = difference();
+      unsigned long lat=gps.getLat();
+      unsigned long lon=gps.getLon();      
+      unsigned long _speed_diff = distance_between(_speed_lat, _speed_lon, lat, lon);
+      unsigned long _rec_diff = distance_between(_rec_lat, _rec_lon, lat, lon);
 
-      
-      
-      if ( _diff>=1000 && millis()-_writeTimer >= write_delay) {
+      if ( _rec_diff>=_write_space && millis()-_writeTimer >= write_delay) {
+          _rec_lat = lat;
+          _rec_lon = lon;
+          
           sdWrite();
-          
-          if (millis()-_speedTimer>=1000){
-            _speed = _diff/(millis()-_speedTimer);
-            _speedTimer=millis();
-          }
-      
-          _lat = gps.getLat();
-          _lon = gps.getLon();
-          
-          if (_reset){
-              _start_lat=_lat;
-              _start_lon=_lon;
-              _reset = false;
-          }else{ //Avoids recording the first position shift
-              _path_distance+=_diff;
-          }
           _writeTimer=millis();
+          if(!_reset) _path_distance+=_rec_diff;
+      }
+      
+      if (millis()-_speedTimer>=1000){
+        _speed = _speed_diff/(millis()-_speedTimer);
+        _speedTimer=millis();
+      }
+      
+      if (_reset){
+          _start_lat=lat;
+          _start_lon=lon;
+          _reset = false;
       }
     }
 }
@@ -156,5 +136,5 @@ unsigned long NavHandler::distance_between(long lat1, long lon1, long lat2, long
                 B/6*cos2SigmaM*(-3+4*sinSigma*sinSigma)*(-3+4*cos2SigmaM*cos2SigmaM)));
     float s = b*A*(sigma-deltaSigma);
 
-    return (unsigned long)s*1000; //returns distance in mm
+    return (unsigned long)s; //returns distance in mm
 }

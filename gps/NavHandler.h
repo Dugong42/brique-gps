@@ -9,14 +9,15 @@ class NavHandler {
 
         bool _reset;
         int _mod,_write_delay,_write_range;
-        long _lat, _lon, _lat_p, _lon_p;
+        long _speed_lat, _speed_lon, _lat_p, _lon_p;
         unsigned long _writeTimer;
         long _start_lat, _start_lon;
+        long _rec_lat, _rec_lon;
         unsigned long _path_distance;
         unsigned long _speed;
         unsigned long _speedTimer;
+        int _write_space;
 
-        unsigned long difference();
         unsigned long distance_between(long lat1, long lat2, long lon1, long lon2);
         int sdWrite();
 

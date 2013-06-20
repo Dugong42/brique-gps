@@ -50,7 +50,7 @@ unsigned long timer;
 unsigned long curTimer, prevTimer; // Timers used to do a mean of the gps refresh rate
 int meanTick=0;
 int affichage;
-int writeMod=2;
+int writeMod=5;
 int voltage;
 
 // FUNCTION
@@ -186,7 +186,7 @@ void handleButtons() {
                 break;
 
             case 3:
-                writeMod=(writeMod+1)%3;
+                writeMod=writeMod%20+5;
                 nav.setMod(writeMod);
                 lcd.notify(MSG_MODS[writeMod], "REC BY");
                 break;
