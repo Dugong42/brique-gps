@@ -56,19 +56,18 @@ int voltage;
 // FUNCTION
 // Initialisation
 void setup() {
-      
     timer=millis();
     curTimer=millis();
     prevTimer=curTimer;
     pinMode(10, OUTPUT);
     affichage = 1;
-        
+
     //analogReag return an int between 0 and 1023
     voltage = analogRead(VOLTPIN);
     //Affiche en pourcentage si je me rapelle de ma règle de 3
     char batteryLvl[16];
     sprintf(batteryLvl, "%d mv", ((long)voltage*3300)/1023);
-        
+
     // I'm always ready for you bro
     lcd.notify(batteryLvl, "READY");
 }
@@ -103,7 +102,7 @@ int demuxButtons() {
 // Print various information
 // Latitude, Longitude, Date, Speed, etc.
 void printInfos() {
-    
+
     switch (affichage) {
         case 0 :
             // Straight distance

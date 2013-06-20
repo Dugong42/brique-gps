@@ -5,7 +5,6 @@
 
 class NavHandler {
     private:
-        //SDhandler _sdCard;
 
         bool _reset, ;
         int _mod,_write_delay,_write_range;
@@ -19,16 +18,15 @@ class NavHandler {
         int _write_space;
 
         unsigned long distance_between(long lat1, long lat2, long lon1, long lon2);
-        int sdWrite();
+        void sdWrite();
 
 
     public:
         NavHandler();
-        
-        GPShandler gps;        
-        
+        GPShandler gps;
+        SDhandler sdCard;
         void reset();
-        
+
         unsigned long getSpeed();
         unsigned long getAbsoluteDistance();
         unsigned long getRouteDistance();

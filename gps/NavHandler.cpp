@@ -2,10 +2,10 @@
 #include "NavHandler.h"
 #include "SDhandler.h"
 
-NavHandler::NavHandler(/*GPShandler & gps*/) :
-    //_sdCard(SDhandler()),
+NavHandler::NavHandler() :
+    sdCard(SDhandler()),
     gps(GPShandler())
-    
+
 {
     _write_delay=1000;
     _write_space=5;
@@ -38,7 +38,7 @@ const int PRECISION = 1000; // The distance is rounded to 1m*PRECISION
 // Getters and setters
 
 unsigned long NavHandler::getAbsoluteDistance() {
-    //return distance_between(4826978, 406634, 4827024, 406554);  
+    //return distance_between(4826978, 406634, 4827024, 406554);
     return distance_between(_start_lat, _start_lon, gps.getLat(), gps.getLon());
 }
 unsigned long NavHandler::getRouteDistance() { return _path_distance; }
@@ -53,19 +53,19 @@ void NavHandler::reset(){
     _start_lat=0;
     _start_lon=0;
     gps.stop();
-    //_sdCard.changeFile();
+    sdCard.changeFile();
 }
 
 // Other functions
 
 void NavHandler::render(LCDhandler & lcd) {
-    
+
     unsigned long lat,lon;
-    
+
     gps.refreshData(lcd);
-    
+
     bool newCoord = _speed_lat!=gps.getLat() || _speed_lon!=gps.getLon();
-  
+
     // Do navigation-related work here
     if (gps.isRunning() && newCoord){
       lat=gps.getLat();
@@ -78,7 +78,7 @@ void NavHandler::render(LCDhandler & lcd) {
       if ( _rec_diff>=_write_space*PRECISION && millis()-_writeTimer >= _write_delay) {
           _rec_lat = lat;
           _rec_lon = lon;
-          
+
           sdWrite();
           _writeTimer=millis();
           if(!_reset) _path_distance+=_rec_diff;
@@ -101,9 +101,9 @@ void NavHandler::render(LCDhandler & lcd) {
     }
 }
 
-int NavHandler::sdWrite() {
-  return 0;
-   // return _sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(), gps.getTime(), gps.getSpeed());
+void NavHandler::sdWrite() {
+    //return 0;
+    sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(), gps.getTime(), gps.getSpeed());
 }
 
 // Distance between two given points
@@ -133,7 +133,7 @@ unsigned long NavHandler::distance_between(long lat1, long lon1, long lat2, long
 
         if (cosSqAlpha==0) { cos2SigmaM = 0; } // equatorial line: cosSqAlpha=0
         else{ cos2SigmaM = cosSigma - 2*sinU1*sinU2/cosSqAlpha; }
-        
+
         C = f/16*cosSqAlpha*(4+f*(4-3*cosSqAlpha));
         lambdaP = lambda;
         lambda = L + (1-C) * f * sinAlpha *
@@ -148,6 +148,7 @@ unsigned long NavHandler::distance_between(long lat1, long lon1, long lat2, long
     float deltaSigma = B*sinSigma*(cos2SigmaM+B/4*(cosSigma*(-1+2*cos2SigmaM*cos2SigmaM)-
                 B/6*cos2SigmaM*(-3+4*sinSigma*sinSigma)*(-3+4*cos2SigmaM*cos2SigmaM)));
     float s = b*A*(sigma-deltaSigma);
-        
+
     return (unsigned long)(s*PRECISION); //returns distance in m * 100
 }
+
