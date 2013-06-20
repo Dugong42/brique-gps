@@ -5,7 +5,7 @@
 
 class NavHandler {
     private:
-        SDhandler _sdCard;
+        //SDhandler _sdCard;
         GPShandler _gps;
 
         bool _reset;

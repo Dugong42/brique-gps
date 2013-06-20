@@ -43,7 +43,7 @@ char* MSG_MODS[3]={"Temps","Distance","Combo"};
 // Init external components
 LCDhandler lcd;
 GPShandler gps;
-SDhandler sdCard;
+//SDhandler sdCard;
 NavHandler nav(gps);
 
 // Declaration of used variables
@@ -63,7 +63,6 @@ void setup() {
     prevTimer=curTimer;
     pinMode(10, OUTPUT);
     affichage = 1;
-    sdCard.init();
         
     //analogReag return an int between 0 and 1023
     voltage = analogRead(VOLTPIN);

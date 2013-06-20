@@ -10,6 +10,7 @@
 //Constructor
 SDhandler::SDhandler() {
     _nameFile[NAMESIZE];
+    init();
 }
 
 // METHOD

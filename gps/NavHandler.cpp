@@ -2,8 +2,8 @@
 #include "NavHandler.h"
 #include "SDhandler.h"
 
-NavHandler::NavHandler(GPShandler & gps) :
-    _sdCard(SDhandler())
+NavHandler::NavHandler(GPShandler & gps)/* :
+    _sdCard(SDhandler())*/
 {
     _speed=0;
     _path_distance=0;
@@ -16,7 +16,6 @@ NavHandler::NavHandler(GPShandler & gps) :
     _lon_p=0;
     _mod=0;
     _gps=gps;
-    _sdCard.init();
     _writeTimer=millis();
     _speedTimer=_writeTimer;
     setMod(2);
@@ -47,7 +46,7 @@ void NavHandler::reset(){
     _reset=true;
     _path_distance=0;
     _gps.stop();
-    _sdCard.changeFile();
+    //_sdCard.changeFile();
 }
 
 unsigned long NavHandler::getSpeed(){ return _speed; }
@@ -105,7 +104,8 @@ void NavHandler::render() {
 }
 
 int NavHandler::sdWrite() {
-    return _sdCard.writeCoordinates (_gps.getLat(), _gps.getLon(), _gps.getDate(), _gps.getTime(), _gps.getSpeed());
+  return 0;
+   // return _sdCard.writeCoordinates (_gps.getLat(), _gps.getLon(), _gps.getDate(), _gps.getTime(), _gps.getSpeed());
 }
 
 // Distance between two given points
