@@ -16,12 +16,9 @@
 class SDhandler {
     private :
         char _nameFile[];
-        int _numFile;
-        File _logFile;
 
     public :
         SDhandler();
-        void init();
         void writeCoordinates (long lat, long lon, unsigned long date,
                 unsigned long time, unsigned long gspeed);
         void changeFile();

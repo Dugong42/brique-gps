@@ -10,15 +10,7 @@
 //Constructor
 SDhandler::SDhandler() {
     strcpy(_nameFile, "GPS.TXT");
-
     SD.begin(CS);
-}
-
-// METHOD
-// Init SD
-void SDhandler::init() {
-;
-    // Init SD communication
 }
 
 /**
@@ -37,15 +29,14 @@ void SDhandler::init() {
 void SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
         unsigned long time, unsigned long gspeed)
 {
-    // _logFile = SD.open(_nameFile, FILE_WRITE);
     char logEntry[LOGENTRY_SIZE];
+    File logFile = SD.open(_nameFile, FILE_WRITE);
 
     sprintf(logEntry, "%f;%f;%f;%f;%f;\n", lat, lon, gspeed, date, time);
-    _logFile = SD.open(_nameFile, FILE_WRITE);
 
-    if (_logFile) {
-        _logFile.println(logEntry);
-        _logFile.close();
+    if (logFile) {
+        logFile.println(logEntry);
+        logFile.close();
     }
 }
 
@@ -54,12 +45,11 @@ void SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
  *@brief Increment the name of the file and create it
  */
 void SDhandler::changeFile() {
-    _logFile = SD.open(_nameFile, FILE_WRITE);
-    if (_logFile) {
-        _logFile.println("\n");
-        _logFile.println("latitude;longitude;date;time;speed;\n");
-        delay(4000);
-        _logFile.close();
+    File logFile = SD.open(_nameFile, FILE_WRITE);
+    if (logFile) {
+        logFile.println("\n");
+        logFile.println("latitude;longitude;date;time;speed;\n");
+        logFile.close();
     }
 }
 
@@ -68,17 +58,16 @@ void SDhandler::changeFile() {
 void SDhandler::dumpFile(LCDhandler lcd, char* filename) {
     // open the file. note that only one file can be open at a time,
     // so you have to close this one before opening another.
-
+    File logFile = SD.open(_nameFile, FILE_READ);
     // if the file is available, write to it:
-    if (_logFile) {
-        while (_logFile.available()) {
+    if (logFile) {
+        while (logFile.available()) {
             lcd.printline("Reading",0);
             lcd.printline(filename,1);
-            Serial.write(_logFile.read());
+            Serial.write(logFile.read());
         }
-    //    _logFile.close();
+        logFile.close();
         SD.remove(_nameFile);
-    //    _logFile = SD.open(_nameFile, FILE_WRITE);
         lcd.notify("Sync OK.","INFO");
     }
     // if the file isn't open, pop up an error:
