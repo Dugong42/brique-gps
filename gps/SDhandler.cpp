@@ -33,12 +33,14 @@ int SDhandler::init() {
 
     else {
         _lastFile = SD.open("lastfile.txt", FILE_READ);
-        char buffer[10];
-        int i=0;
+        char buffer[5];
+        int i=-1;
         do {
-          buffer[i] = _lastFile.read();
           i++;
-        }while (buffer[i-1]!=-1)
+          buffer[i] = _lastFile.read();
+        } while (buffer[i]!=-1);
+        buffer[i]='\0';
+        
         _numFile = (int)strtol(buffer, NULL, 10);
         _lastFile.close();
         _numFile = _numFile + 1;
