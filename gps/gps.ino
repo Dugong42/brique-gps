@@ -11,6 +11,7 @@
 // include the library code:
 #include <Arduino.h>
 #include <LiquidCrystal.h>
+#include <SoftwareSerial.h>
 #include <SD.h>
 
 #include "LCDhandler.h"
