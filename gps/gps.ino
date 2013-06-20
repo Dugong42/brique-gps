@@ -67,7 +67,6 @@ void setup() {
     char batteryLvl[16];
     sprintf(batteryLvl, "%d mv", ((long)voltage*3300)/1023);
 
-    nav.sdCard.init();
     // I'm always ready for you bro
     lcd.notify(batteryLvl, "READY");
 }

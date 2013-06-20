@@ -9,21 +9,16 @@
 
 //Constructor
 SDhandler::SDhandler() {
-    _nameFile[NAMESIZE];
+    strcpy(_nameFile, "GPS.TXT");
+
+    SD.begin(CS);
 }
 
 // METHOD
 // Init SD
 void SDhandler::init() {
-
+;
     // Init SD communication
-    if (!SD.begin(CS)) {
-        return;
-    }
-
-    strcpy(_nameFile, "GPS0.TXT");
-    _logFile = SD.open(_nameFile, FILE_WRITE);
-
 }
 
 /**
@@ -46,8 +41,12 @@ void SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
     char logEntry[LOGENTRY_SIZE];
 
     sprintf(logEntry, "%f;%f;%f;%f;%f;\n", lat, lon, gspeed, date, time);
-    _logFile.write(logEntry);
-    _logFile.flush();
+    _logFile = SD.open(_nameFile, FILE_WRITE);
+
+    if (_logFile) {
+        _logFile.println(logEntry);
+        _logFile.close();
+    }
 }
 
 /**
@@ -55,24 +54,13 @@ void SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
  *@brief Increment the name of the file and create it
  */
 void SDhandler::changeFile() {
-
-    //    _logFile.print("\n");
-    _logFile.write("latitude;longitude;date;time;speed;\n");
-    _logFile.flush();
-
-    //    _numFile = _numFile + 1;
-    //    sprintf (_nameFile ,"GPS%d.txt", _numFile);
-    //
-    //    _lastFile = SD.open(".last", FILE_WRITE);
-    //    _lastFile.seek(0);
-    //    _lastFile.print(_numFile, DEC);
-    //    _lastFile.close();
-    //
-    //    _logFile = SD.open(_nameFile, FILE_WRITE);
-    //    //    _lastFile.seek(0);
-    //    _logFile.println("latitude;longitude;date;time;speed;");
-    //    _logFile.close();
-    //    return 1;
+    _logFile = SD.open(_nameFile, FILE_WRITE);
+    if (_logFile) {
+        _logFile.println("\n");
+        _logFile.println("latitude;longitude;date;time;speed;\n");
+        delay(4000);
+        _logFile.close();
+    }
 }
 
 // PROCEDURE
@@ -88,9 +76,9 @@ void SDhandler::dumpFile(LCDhandler lcd, char* filename) {
             lcd.printline(filename,1);
             Serial.write(_logFile.read());
         }
-        _logFile.close();
+    //    _logFile.close();
         SD.remove(_nameFile);
-        _logFile = SD.open(_nameFile, FILE_WRITE);
+    //    _logFile = SD.open(_nameFile, FILE_WRITE);
         lcd.notify("Sync OK.","INFO");
     }
     // if the file isn't open, pop up an error:
