@@ -1,4 +1,4 @@
-
+﻿
 /**
  * \file SDhandler.c
  * \brief Fonctions pour sauvegarder des informations sur la carte SD
@@ -90,7 +90,7 @@ int SDhandler::changeFile() {
     _lastFile.close();
 
     _logFile = SD.open(_nameFile, FILE_WRITE);
-//    _lastFile.seek(0);
+    //    _lastFile.seek(0);
     _logFile.println("latitude;longitude;date;time;speed;");
     _logFile.close();
     return 1;
