@@ -199,7 +199,7 @@ void handleButtons() {
                 while (demuxButtons() == 1 && millis()-rsttimer < RSTDELAY) {;}
 
                 if (millis()-rsttimer >= RSTDELAY) {
-                    gps.stop();
+                    nav.reset();
                     lcd.notify("RESET");
 
                     //The file on the SD is closed and another one is oponed when the system reset

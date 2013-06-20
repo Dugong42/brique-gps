@@ -26,6 +26,7 @@ class NavHandler {
     public:
         NavHandler(GPShandler &);
         
+        void reset();
         unsigned long getSpeed();
         unsigned long getAbsoluteDistance();
         unsigned long getRouteDistance();

@@ -39,6 +39,13 @@ unsigned long NavHandler::difference() {
     return distance_between(_lat, _lon, _gps.getLat(), _gps.getLon());
 }
 
+void NavHandler::reset(){
+    _reset=true;
+    _path_distance=0;
+    _gps.stop();
+    _sdCard.changeFile();
+}
+
 unsigned long NavHandler::getSpeed(){ return _speed; }
 
 // Distance between two given points
@@ -101,7 +108,7 @@ void NavHandler::render() {
             _start_lat=_lat;
             _start_lon=_lon;
             _reset = false;
-        }else{ //Avoids recording the first shift
+        }else{ //Avoids recording the first position shift
             _path_distance+=_diff;
         }
         _writeTimer=millis();
