@@ -1,4 +1,5 @@
 #include "GPShandler.h"
+#include "LCDhandler.h"
 #include "NavHandler.h"
 #include "SDhandler.h"
 
@@ -152,3 +153,6 @@ unsigned long NavHandler::distance_between(long lat1, long lon1, long lat2, long
     return (unsigned long)(s*PRECISION); //returns distance in m * 100
 }
 
+void NavHandler::initUSBSync(LCDhandler & lcd) {
+    sdCard.dumpFile(lcd);
+}

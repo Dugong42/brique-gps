@@ -14,6 +14,13 @@ SDhandler::SDhandler() {;
 void SDhandler::init() {
     strcpy(_nameFile, "GPS.TXT");
     SD.begin(CS);
+
+    File logFile = SD.open(_nameFile, FILE_WRITE);
+    if (logFile) {
+        logFile.println("latitude;longitude;date;time;speed;");
+        logFile.close();
+    }
+
 }
 
 /**
@@ -35,10 +42,10 @@ void SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
     char logEntry[LOGENTRY_SIZE];
     File logFile = SD.open(_nameFile, FILE_WRITE);
 
-    sprintf(logEntry, "%f;%f;%f;%f;%f;\n", lat, lon, gspeed, date, time);
+    sprintf(logEntry, "%f;%f;%f;%f;%f;", lat, lon, gspeed, date, time);
 
     if (logFile) {
-        logFile.write(logEntry);
+        logFile.println(logEntry);
         logFile.close();
     }
 }
@@ -50,28 +57,30 @@ void SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
 void SDhandler::changeFile() {
     File logFile = SD.open(_nameFile, FILE_WRITE);
     if (logFile) {
-//        logFile.println("\n");
-        logFile.println("latitude;longitude;date;time;speed;\n");
+        logFile.println("");
+        logFile.println("latitude;longitude;date;time;speed;");
         logFile.close();
     }
 }
 
 // PROCEDURE
 // read a file "filename" to Serial port
-void SDhandler::dumpFile(LCDhandler lcd, char* filename) {
+void SDhandler::dumpFile(LCDhandler & lcd) {
     // open the file. note that only one file can be open at a time,
     // so you have to close this one before opening another.
     File logFile = SD.open(_nameFile, FILE_READ);
     // if the file is available, write to it:
-    if (logFile) {
+    if (logFile && Serial.available()) {
         while (logFile.available()) {
-            lcd.printline("Reading",0);
-            lcd.printline(filename,1);
-            Serial.write(logFile.read());
+            lcd.printline("Reading", 0);
+            lcd.printline(_nameFile, 1);
+            Serial.begin(9600);
+            Serial.println(logFile.read());
         }
+
         logFile.close();
         SD.remove(_nameFile);
-        lcd.notify("Sync OK.","INFO");
+        lcd.notify("Sync OK.", "INFO");
     }
     // if the file isn't open, pop up an error:
     else {

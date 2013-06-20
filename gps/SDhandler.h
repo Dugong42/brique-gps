@@ -23,6 +23,6 @@ class SDhandler {
         void writeCoordinates (long lat, long lon, unsigned long date,
                 unsigned long time, unsigned long gspeed);
         void changeFile();
-        void dumpFile(LCDhandler lcd, char* filename);
+        void dumpFile(LCDhandler &);
 };
 #endif

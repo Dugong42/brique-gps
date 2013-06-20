@@ -2,6 +2,7 @@
 #define NAVHANDLER_H
 #include "GPShandler.h"
 #include "SDhandler.h"
+#include "LCDhandler.h"
 
 class NavHandler {
     private:
@@ -32,5 +33,6 @@ class NavHandler {
         unsigned long getRouteDistance();
         void setMod(int mod);
         void render(LCDhandler &);
+        void initUSBSync(LCDhandler &);
 };
 #endif
