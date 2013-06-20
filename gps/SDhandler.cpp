@@ -1,3 +1,4 @@
+
 /**
  * \file SDhandler.c
  * \brief Fonctions pour sauvegarder des informations sur la carte SD
@@ -26,20 +27,23 @@ int SDhandler::init() {
     if (!SD.exists("lastfile.txt")) {
         _lastFile = SD.open("lastfile.txt", FILE_WRITE);
         _numFile=0;
-        _lastFile.write(_numFile);
+        _lastFile.print(_numFile);
         strcpy (_nameFile, "GPS0.TXT");
     }
 
     else {
         _lastFile = SD.open("lastfile.txt", FILE_READ);
-        _numFile = _lastFile.read();
+        char buffer[10];
+        int i=0;
+        do {
+          buffer[i] = _lastFile.read();
+          i++;
+        }while (buffer[i-1]!=-1)
+        _numFile = (int)strtol(buffer, NULL, 10);
         _lastFile.close();
         _numFile = _numFile + 1;
         sprintf (_nameFile , "GPS%d.TXT", _numFile);
     }
-
-    _logFile = SD.open(_nameFile, FILE_WRITE);
-    _timerSD=millis();
 
     return 0;
 }
@@ -60,13 +64,13 @@ int SDhandler::init() {
 int SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
         unsigned long time, unsigned long gspeed)
 {
-
+    _logFile = SD.open(_nameFile, FILE_WRITE);
     char logEntry[LOGENTRY_SIZE];
 
     sprintf(logEntry, "%f;%f;%f;%f;%f;", lat, lon, gspeed, date, time);
     if (!_logFile.println (logEntry))
         return errWrite;
-    _logFile.flush();
+    _logFile.close();
 }
 
 /**
@@ -75,20 +79,18 @@ int SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
  */
 int SDhandler::changeFile() {
 
-    _logFile.close();
-
     _numFile = _numFile + 1;
     sprintf (_nameFile ,"GPS%d.txt", _numFile);
 
-    _lastFile = SD.open("lastfile", FILE_WRITE);
+    _lastFile = SD.open("lastfile.txt", FILE_WRITE);
     _lastFile.seek(0);
-    _lastFile.write(_numFile);
+    _lastFile.print(_numFile, DEC);
     _lastFile.close();
 
     _logFile = SD.open(_nameFile, FILE_WRITE);
 //    _lastFile.seek(0);
     _logFile.println("latitude;longitude;date;time;speed;");
-    _logFile.flush();
+    _logFile.close();
     return 1;
 
 }
