@@ -1,4 +1,3 @@
-﻿
 /**
  * \file SDhandler.c
  * \brief Fonctions pour sauvegarder des informations sur la carte SD
@@ -21,31 +20,34 @@ int SDhandler::init() {
     if (!SD.begin(CS)) {
         return -3;
     }
+    
+    strcpy (_nameFile, "GPS0.TXT");
+    _logFile = SD.open(_nameFile, FILE_WRITE);
 
-    //  Initialisation carte
-    if (!SD.exists(".last")) {
-        _lastFile = SD.open(".last", FILE_WRITE);
-        _numFile=0;
-        _lastFile.print(_numFile);
-        strcpy (_nameFile, "GPS0.TXT");
-    }
-
-    else {
-        _lastFile = SD.open(".last", FILE_READ);
-        char buffer[5];
-        int i=-1;
-        do {
-            i++;
-            buffer[i] = _lastFile.read();
-//        } while (buffer[i] != '-1');
-        } while (i <= 4);
-        buffer[i]='\0';
-
-        _numFile = (int)strtol(buffer, NULL, 10);
-        _lastFile.close();
-        _numFile = _numFile + 1;
-        sprintf (_nameFile , "GPS%d.TXT", _numFile);
-    }
+//    //  Initialisation carte
+//    if (!SD.exists(".last")) {
+//        _lastFile = SD.open(".last", FILE_WRITE);
+//        _numFile=0;
+//        _lastFile.print(_numFile);
+//        strcpy (_nameFile, "GPS0.TXT");
+//    }
+//
+//    else {
+//        _lastFile = SD.open(".last", FILE_READ);
+//        char buffer[5];
+//        int i=-1;
+//        do {
+//            i++;
+//            buffer[i] = _lastFile.read();
+////        } while (buffer[i] != '-1');
+//        } while (i <= 4);
+//        buffer[i]='\0';
+//
+//        _numFile = (int)strtol(buffer, NULL, 10);
+//        _lastFile.close();
+//        _numFile = _numFile + 1;
+//        sprintf (_nameFile , "GPS%d.TXT", _numFile);
+//    }
 
     return 0;
 }
@@ -66,13 +68,13 @@ int SDhandler::init() {
 int SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
         unsigned long time, unsigned long gspeed)
 {
-    _logFile = SD.open(_nameFile, FILE_WRITE);
+   // _logFile = SD.open(_nameFile, FILE_WRITE);
     char logEntry[LOGENTRY_SIZE];
 
     sprintf(logEntry, "%f;%f;%f;%f;%f;", lat, lon, gspeed, date, time);
     if (!_logFile.println (logEntry))
         return errWrite;
-    _logFile.close();
+    _logFile.flush();
 }
 
 /**
@@ -81,19 +83,23 @@ int SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
  */
 int SDhandler::changeFile() {
 
-    _numFile = _numFile + 1;
-    sprintf (_nameFile ,"GPS%d.txt", _numFile);
-
-    _lastFile = SD.open(".last", FILE_WRITE);
-    _lastFile.seek(0);
-    _lastFile.print(_numFile, DEC);
-    _lastFile.close();
-
-    _logFile = SD.open(_nameFile, FILE_WRITE);
-    //    _lastFile.seek(0);
-    _logFile.println("latitude;longitude;date;time;speed;");
-    _logFile.close();
-    return 1;
+      _logFile.println("\n");
+      _logFile.println("latitude;longitude;date;time;speed;");
+      _logFile.flush();
+      
+//    _numFile = _numFile + 1;
+//    sprintf (_nameFile ,"GPS%d.txt", _numFile);
+//
+//    _lastFile = SD.open(".last", FILE_WRITE);
+//    _lastFile.seek(0);
+//    _lastFile.print(_numFile, DEC);
+//    _lastFile.close();
+//
+//    _logFile = SD.open(_nameFile, FILE_WRITE);
+//    //    _lastFile.seek(0);
+//    _logFile.println("latitude;longitude;date;time;speed;");
+//    _logFile.close();
+//    return 1;
 
 }
 
@@ -102,16 +108,17 @@ int SDhandler::changeFile() {
 void SDhandler::dumpFile(LCDhandler lcd, char* filename) {
     // open the file. note that only one file can be open at a time,
     // so you have to close this one before opening another.
-    File gpsFile = SD.open(filename);
 
     // if the file is available, write to it:
-    if (gpsFile) {
-        while (gpsFile.available()) {
+    if (_logFile) {
+        while (_logFile.available()) {
             lcd.printline("Reading",0);
             lcd.printline(filename,1);
-            Serial.write(gpsFile.read());
+            Serial.write(_logFile.read());
         }
-        gpsFile.close();
+        _logFile.close();
+        SD.remove(_nameFile);
+        _logFile = SD.open(_nameFile, FILE_WRITE);
         lcd.notify("Sync OK.","INFO");
     }
     // if the file isn't open, pop up an error:
