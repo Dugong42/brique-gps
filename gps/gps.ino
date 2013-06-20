@@ -38,7 +38,7 @@ const int CYCLE_NUMBER = 100;
 // Printed text
 char* MSG_MENUS[6]={"Distance", "Position", "Vitesse", "Stats", "LoopRate", "Temps"};
 
-char* MSG_MODS[3]={"Temps","Distance","Combo"};
+char* MSG_MODS[4]={"5 m","10 m","15 m", "20 m"};
 
 // Init external components
 LCDhandler lcd;
