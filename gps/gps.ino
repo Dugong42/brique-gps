@@ -12,7 +12,6 @@
 #include <Arduino.h>
 #include <LiquidCrystal.h>
 #include <SD.h>
-#include <SoftwareSerial.h>
 
 #include "LCDhandler.h"
 #include "GPShandler.h"
@@ -42,7 +41,6 @@ char* MSG_MODS[4]={"5 m","10 m","15 m", "20 m"};
 
 // Init external components
 LCDhandler lcd;
-//SDhandler sdCard;
 NavHandler nav;
 
 // Declaration of used variables
@@ -64,10 +62,9 @@ void setup() {
 
     //analogReag return an int between 0 and 1023
     voltage = analogRead(VOLTPIN);
-    //Affiche en pourcentage si je me rapelle de ma règle de 3
     char batteryLvl[16];
     sprintf(batteryLvl, "%d mv", ((long)voltage*3300)/1023);
-
+    nav.sdCard.init();
     // I'm always ready for you bro
     lcd.notify(batteryLvl, "READY");
 }

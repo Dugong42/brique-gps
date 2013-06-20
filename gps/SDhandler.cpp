@@ -9,6 +9,10 @@
 
 //Constructor
 SDhandler::SDhandler() {
+    _nameFile[NAMESIZE];
+}
+
+void SDhandler::init() {
     strcpy(_nameFile, "GPS.TXT");
     SD.begin(CS);
 }
@@ -35,7 +39,7 @@ void SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
     sprintf(logEntry, "%f;%f;%f;%f;%f;\n", lat, lon, gspeed, date, time);
 
     if (logFile) {
-        logFile.println(logEntry);
+        logFile.write(logEntry);
         logFile.close();
     }
 }
@@ -47,7 +51,7 @@ void SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
 void SDhandler::changeFile() {
     File logFile = SD.open(_nameFile, FILE_WRITE);
     if (logFile) {
-        logFile.println("\n");
+//        logFile.println("\n");
         logFile.println("latitude;longitude;date;time;speed;\n");
         logFile.close();
     }
