@@ -3,15 +3,13 @@
 #include "GPShandler.h"
 #include "SDhandler.h"
 
-#define WRITE_DELAY 1000
-
 class NavHandler {
     private:
         SDhandler _sdCard;
         GPShandler _gps;
 
         bool _reset;
-        int _mod;
+        int _mod,_write_delay,_write_range;
         long _lat, _lon, _lat_p, _lon_p;
         unsigned long _writeTimer;
         long _start_lat, _start_lon;

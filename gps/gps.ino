@@ -20,10 +20,6 @@
 #include "TinyGPS.h"
 #include "NavHandler.h"
 
-#define  WRITE_BY_TIME  0
-#define  WRITE_BY_SPACE 1
-#define  WRITE_BY_BOTH  2
-
 // PINs
 const int BUT3  = 17;
 const int BUT2  = 16;
@@ -47,6 +43,8 @@ const int CYCLE_NUMBER = 100;
 // Printed text
 char* MSG_MENUS[6]={"Distance", "Position", "Vitesse", "Stats", "LoopRate", "Temps"};
 
+char* MSG_MODS[3]={"Temps","Distance","Combo"};
+
 // Init external components
 LCDhandler lcd;
 GPShandler gps;
@@ -59,7 +57,7 @@ unsigned long timer;
 unsigned long curTimer, prevTimer; // Timers used to do a mean of the gps refresh rate
 int meanTick=0;
 int affichage;
-int writeMode=WRITE_BY_BOTH;
+int writeMod=2;
 int voltage;
 
 // FUNCTION
@@ -219,19 +217,9 @@ void handleButtons() {
                 break;
 
             case 3:
-                if (writeMode == WRITE_BY_BOTH) {
-                    lcd.notify("DEFAULT","REC MODE");
-                    writeMode = WRITE_BY_TIME;
-                }
-                else if (writeMode == WRITE_BY_TIME) {
-                    lcd.notify("BY TIME","REC MODE");
-                    writeMode = WRITE_BY_SPACE;
-                }
-                else if (writeMode == WRITE_BY_SPACE) {
-                    lcd.notify("BY SPACE","REC MODE");
-                    writeMode = WRITE_BY_BOTH;
-                }
-
+                writeMod=(writeMod+1)%3;
+                nav.setMod(writeMod);
+                lcd.notify(MSG_MODS[writeMod], "REC BY");
                 break;
 
             case 4:

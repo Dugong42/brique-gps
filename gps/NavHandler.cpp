@@ -18,6 +18,7 @@ NavHandler::NavHandler(GPShandler & gps) :
     _gps=gps;
     _sdCard.init();
     _writeTimer=millis();
+    setMod(2);
 }
 
 // WGS84 ellipsoid parameters
@@ -28,6 +29,8 @@ const float f = 1/(298.257223563);
 const float pi = 3.1415926;
 const float RAD_CONV = pi/180;
 const float PRECISION = 1e-6f;
+
+int write_delay, write_range;
 
 unsigned long NavHandler::getAbsoluteDistance() {
     return distance_between(_start_lat, _start_lon, _gps.getLat(), _gps.getLon());
@@ -47,6 +50,50 @@ void NavHandler::reset(){
 }
 
 unsigned long NavHandler::getSpeed(){ return _speed; }
+
+void NavHandler::setMod(int mod) {
+    switch(mod){
+        case 0:
+            _write_delay=3000;
+            _write_range=0;
+            break;
+        
+        case 1:
+            _write_delay=0;
+            _write_range=2000;
+            break;
+        
+        case 2:
+            _write_delay=1000;
+            _write_range=500;
+            break;
+        default:
+            break;
+    }
+}
+
+void NavHandler::render() {
+    // Do navigation-related work here
+    unsigned long _diff = difference();
+    if ( _diff>=1000 && millis()-_writeTimer >= write_delay) {
+        sdWrite();
+        _lat = _gps.getLat();
+        _lon = _gps.getLon();
+        _speed = _diff/(millis()-_writeTimer);
+        if (_reset){
+            _start_lat=_lat;
+            _start_lon=_lon;
+            _reset = false;
+        }else{ //Avoids recording the first position shift
+            _path_distance+=_diff;
+        }
+        _writeTimer=millis();
+    }
+}
+
+int NavHandler::sdWrite() {
+    return _sdCard.writeCoordinates (_gps.getLat(), _gps.getLon(), _gps.getDate(), _gps.getTime(), _gps.getSpeed());
+}
 
 // Distance between two given points
 unsigned long NavHandler::distance_between(long lat1, long lon1, long lat2, long lon2){
@@ -92,29 +139,4 @@ unsigned long NavHandler::distance_between(long lat1, long lon1, long lat2, long
     float s = b*A*(sigma-deltaSigma);
 
     return (unsigned long)s*1000; //returns distance in mm
-}
-
-void NavHandler::setMod(int mod) { _mod=mod; }
-
-void NavHandler::render() {
-    // Do navigation-related work here
-    unsigned long _diff = difference();
-    if ( _diff>=1000 && millis()-_writeTimer >= WRITE_DELAY) {
-        sdWrite();
-        _lat = _gps.getLat();
-        _lon = _gps.getLon();
-        _speed = _diff/(millis()-_writeTimer);
-        if (_reset){
-            _start_lat=_lat;
-            _start_lon=_lon;
-            _reset = false;
-        }else{ //Avoids recording the first position shift
-            _path_distance+=_diff;
-        }
-        _writeTimer=millis();
-    }
-}
-
-int NavHandler::sdWrite() {
-    return _sdCard.writeCoordinates (_gps.getLat(), _gps.getLon(), _gps.getDate(), _gps.getTime(), _gps.getSpeed());
 }
