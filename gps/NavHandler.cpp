@@ -2,10 +2,9 @@
 #include "NavHandler.h"
 #include "SDhandler.h"
 
-NavHandler::NavHandler(/*GPShandler & gps*/) :
-    //_sdCard(SDhandler()),
+NavHandler::NavHandler() :
+    _sdCard(SDhandler()),
     gps(GPShandler())
-    
 {
     _write_delay=1000;
     _write_space=5;
@@ -51,47 +50,47 @@ void NavHandler::reset(){
     _start_lat=gps.getLat();
     _start_lon=gps.getLon();
     gps.stop();
-    //_sdCard.changeFile();
+    _sdCard.changeFile();
 }
 
 // Other functions
 
 void NavHandler::render(LCDhandler & lcd) {
-  
+
     gps.refreshData(lcd);
-  
+
     // Do navigation-related work here
     if (gps.isRunning()){
-      unsigned long lat=gps.getLat();
-      unsigned long lon=gps.getLon();      
-      unsigned long _speed_diff = distance_between(_speed_lat, _speed_lon, lat, lon);
-      unsigned long _rec_diff = distance_between(_rec_lat, _rec_lon, lat, lon);
+        unsigned long lat=gps.getLat();
+        unsigned long lon=gps.getLon();
+        unsigned long _speed_diff = distance_between(_speed_lat, _speed_lon, lat, lon);
+        unsigned long _rec_diff = distance_between(_rec_lat, _rec_lon, lat, lon);
 
-      if ( _rec_diff>=_write_space*1000 && millis()-_writeTimer >= _write_delay) {
-          _rec_lat = lat;
-          _rec_lon = lon;
-          
-          sdWrite();
-          _writeTimer=millis();
-          if(!_reset) _path_distance+=_rec_diff;
-      }
-      
-      if (millis()-_speedTimer>=1000){
-        _speed = _speed_diff/(millis()-_speedTimer);
-        _speedTimer=millis();
-      }
-      
-      if (_reset){
-          _start_lat=lat;
-          _start_lon=lon;
-          _reset = false;
-      }
+        if ( _rec_diff>=_write_space*1000 && millis()-_writeTimer >= _write_delay) {
+            _rec_lat = lat;
+            _rec_lon = lon;
+
+            sdWrite();
+            _writeTimer=millis();
+            if(!_reset) _path_distance+=_rec_diff;
+        }
+
+        if (millis()-_speedTimer>=1000){
+            _speed = _speed_diff/(millis()-_speedTimer);
+            _speedTimer=millis();
+        }
+
+        if (_reset){
+            _start_lat=lat;
+            _start_lon=lon;
+            _reset = false;
+        }
     }
 }
 
 int NavHandler::sdWrite() {
-  return 0;
-   // return _sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(), gps.getTime(), gps.getSpeed());
+    //return 0;
+    return _sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(), gps.getTime(), gps.getSpeed());
 }
 
 // Distance between two given points
@@ -121,7 +120,7 @@ unsigned long NavHandler::distance_between(long lat1, long lon1, long lat2, long
 
         if (cosSqAlpha==0) { cos2SigmaM = 0; } // equatorial line: cosSqAlpha=0
         else{ cos2SigmaM = cosSigma - 2*sinU1*sinU2/cosSqAlpha; }
-        
+
         C = f/16*cosSqAlpha*(4+f*(4-3*cosSqAlpha));
         lambdaP = lambda;
         lambda = L + (1-C) * f * sinAlpha *

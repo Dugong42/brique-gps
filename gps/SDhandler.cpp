@@ -16,25 +16,32 @@ SDhandler::SDhandler() {
 // METHOD
 // Init SD
 int SDhandler::init() {
-    //  Initialisation carte
 
+    // Init SD communication
+    if (!SD.begin(CS)) {
+        return -3;
+    }
+
+    //  Initialisation carte
     if (!SD.exists("lastfile.txt")) {
         _lastFile = SD.open("lastfile.txt", FILE_WRITE);
         _numFile=0;
         _lastFile.write(_numFile);
-        strcpy (_nameFile, "gpslog0.txt");
+        strcpy (_nameFile, "GPS0.TXT");
     }
+
     else {
         _lastFile = SD.open("lastfile.txt", FILE_READ);
         _numFile = _lastFile.read();
         _lastFile.close();
         _numFile = _numFile + 1;
-        sprintf (_nameFile ,"gpslog%d.txt", _numFile);
+        sprintf (_nameFile , "GPS%d.TXT", _numFile);
     }
 
     _logFile = SD.open(_nameFile, FILE_WRITE);
     _timerSD=millis();
 
+    return 0;
 }
 
 /**
@@ -71,7 +78,7 @@ int SDhandler::changeFile() {
     _logFile.close();
 
     _numFile = _numFile + 1;
-    sprintf (_nameFile ,"gpslog%d.txt", _numFile);
+    sprintf (_nameFile ,"GPS%d.txt", _numFile);
 
     _lastFile = SD.open("lastfile", FILE_WRITE);
     _lastFile.seek(0);
@@ -79,8 +86,9 @@ int SDhandler::changeFile() {
     _lastFile.close();
 
     _logFile = SD.open(_nameFile, FILE_WRITE);
-    if (!_logFile.println ("latitude;longitude;date;time;speed;"))
-        return errWrite;
+//    _lastFile.seek(0);
+    _logFile.println("latitude;longitude;date;time;speed;");
+    _logFile.flush();
     return 1;
 
 }
