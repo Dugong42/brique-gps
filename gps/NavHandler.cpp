@@ -2,9 +2,10 @@
 #include "NavHandler.h"
 #include "SDhandler.h"
 
-NavHandler::NavHandler() :
-    _sdCard(SDhandler()),
+NavHandler::NavHandler(/*GPShandler & gps*/) :
+    //_sdCard(SDhandler()),
     gps(GPShandler())
+    
 {
     _write_delay=1000;
     _write_space=5;
@@ -18,7 +19,6 @@ NavHandler::NavHandler() :
     _rec_lon=0;
     _rec_lat=0;
     _mod=0;
-    gps=gps;
     _writeTimer=millis();
     _speedTimer=_writeTimer;
     setMod(2);
@@ -29,13 +29,16 @@ const float a = 6378137;
 const float b = 6356752.314245;
 const float f = 1/(298.257223563);
 
-const float pi = 3.141593;
+const float pi = 3.1415926;
 const float RAD_CONV = pi/180;
-const float PRECISION = 1e-6f;
+const float LIMIT = 1e-9f;
+
+const int PRECISION = 1000; // The distance is rounded to 1m*PRECISION
 
 // Getters and setters
 
 unsigned long NavHandler::getAbsoluteDistance() {
+    //return distance_between(4826978, 406634, 4827024, 406554);  
     return distance_between(_start_lat, _start_lon, gps.getLat(), gps.getLon());
 }
 unsigned long NavHandler::getRouteDistance() { return _path_distance; }
@@ -47,50 +50,60 @@ void NavHandler::setMod(int mod) { _write_space=mod; }
 void NavHandler::reset(){
     _reset=true;
     _path_distance=0;
-    _start_lat=gps.getLat();
-    _start_lon=gps.getLon();
+    _start_lat=0;
+    _start_lon=0;
     gps.stop();
-    _sdCard.changeFile();
+    //_sdCard.changeFile();
 }
 
 // Other functions
 
 void NavHandler::render(LCDhandler & lcd) {
-
+    
+    unsigned long lat,lon;
+    
     gps.refreshData(lcd);
-
+    
+    bool newCoord = _speed_lat!=gps.getLat() || _speed_lon!=gps.getLon();
+  
     // Do navigation-related work here
-    if (gps.isRunning()){
-        unsigned long lat=gps.getLat();
-        unsigned long lon=gps.getLon();
-        unsigned long _speed_diff = distance_between(_speed_lat, _speed_lon, lat, lon);
-        unsigned long _rec_diff = distance_between(_rec_lat, _rec_lon, lat, lon);
+    if (gps.isRunning() && newCoord){
+      lat=gps.getLat();
+      lon=gps.getLon();
+      unsigned long _speed_diff = distance_between(_speed_lat, _speed_lon, lat, lon);
+      unsigned long _rec_diff = distance_between(_rec_lat, _rec_lon, lat, lon);
 
-        if ( _rec_diff>=_write_space*1000 && millis()-_writeTimer >= _write_delay) {
-            _rec_lat = lat;
-            _rec_lon = lon;
+      // Enregistrement de coordonnées
 
-            sdWrite();
-            _writeTimer=millis();
-            if(!_reset) _path_distance+=_rec_diff;
-        }
+      if ( _rec_diff>=_write_space*PRECISION && millis()-_writeTimer >= _write_delay) {
+          _rec_lat = lat;
+          _rec_lon = lon;
+          
+          sdWrite();
+          _writeTimer=millis();
+          if(!_reset) _path_distance+=_rec_diff;
+      }
 
-        if (millis()-_speedTimer>=1000){
-            _speed = _speed_diff/(millis()-_speedTimer);
-            _speedTimer=millis();
-        }
+      // Calcul de vitesse instantanée
+      if (millis()-_speedTimer>=2000){
+        _speed = _speed_diff*1000/(millis()-_speedTimer);
+        _speedTimer=millis();
+        _speed_lat=lat;
+        _speed_lon=lon;
+      }
 
-        if (_reset){
-            _start_lat=lat;
-            _start_lon=lon;
-            _reset = false;
-        }
+      // Mémorisation du start
+      if (_reset){
+          _reset = false;
+          _start_lat=lat;
+          _start_lon=lon;
+      }
     }
 }
 
 int NavHandler::sdWrite() {
-    //return 0;
-    return _sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(), gps.getTime(), gps.getSpeed());
+  return 0;
+   // return _sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(), gps.getTime(), gps.getSpeed());
 }
 
 // Distance between two given points
@@ -120,14 +133,14 @@ unsigned long NavHandler::distance_between(long lat1, long lon1, long lat2, long
 
         if (cosSqAlpha==0) { cos2SigmaM = 0; } // equatorial line: cosSqAlpha=0
         else{ cos2SigmaM = cosSigma - 2*sinU1*sinU2/cosSqAlpha; }
-
+        
         C = f/16*cosSqAlpha*(4+f*(4-3*cosSqAlpha));
         lambdaP = lambda;
         lambda = L + (1-C) * f * sinAlpha *
             (sigma + C*sinSigma*(cos2SigmaM+C*cosSigma*(-1+2*cos2SigmaM*cos2SigmaM)));
-    } while(abs(lambda-lambdaP)>PRECISION && ++iteration<100);
+    } while(abs(lambda-lambdaP)>LIMIT && ++iteration<100);
 
-    if (iteration==0) return 0;  // formula failed to converge
+    if (iteration==100) return 0;  // formula failed to converge
 
     float uSq = cosSqAlpha * (a*a - b*b) / (b*b);
     float A = 1 + uSq/16384*(4096+uSq*(-768+uSq*(320-175*uSq)));
@@ -135,6 +148,6 @@ unsigned long NavHandler::distance_between(long lat1, long lon1, long lat2, long
     float deltaSigma = B*sinSigma*(cos2SigmaM+B/4*(cosSigma*(-1+2*cos2SigmaM*cos2SigmaM)-
                 B/6*cos2SigmaM*(-3+4*sinSigma*sinSigma)*(-3+4*cos2SigmaM*cos2SigmaM)));
     float s = b*A*(sigma-deltaSigma);
-
-    return (unsigned long)s*100; //returns distance in cm
+        
+    return (unsigned long)(s*PRECISION); //returns distance in m * 100
 }
