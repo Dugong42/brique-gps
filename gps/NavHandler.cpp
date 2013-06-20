@@ -2,8 +2,10 @@
 #include "NavHandler.h"
 #include "SDhandler.h"
 
-NavHandler::NavHandler(GPShandler & gps)/* :
-    _sdCard(SDhandler())*/
+NavHandler::NavHandler(/*GPShandler & gps*/) :
+    //_sdCard(SDhandler()),
+    gps(GPShandler())
+    
 {
     _speed=0;
     _path_distance=0;
@@ -15,7 +17,7 @@ NavHandler::NavHandler(GPShandler & gps)/* :
     _lat_p=0;
     _lon_p=0;
     _mod=0;
-    _gps=gps;
+    gps=gps;
     _writeTimer=millis();
     _speedTimer=_writeTimer;
     setMod(2);
@@ -33,19 +35,19 @@ const float PRECISION = 1e-6f;
 int write_delay, write_range;
 
 unsigned long NavHandler::getAbsoluteDistance() {
-    return distance_between(_start_lat, _start_lon, _gps.getLat(), _gps.getLon());
+    return distance_between(_start_lat, _start_lon, gps.getLat(), gps.getLon());
 }
 unsigned long NavHandler::getRouteDistance() { return _path_distance; }
 
 // Distance between the current location and the previous recorded
 unsigned long NavHandler::difference() {
-    return distance_between(_lat, _lon, _gps.getLat(), _gps.getLon());
+    return distance_between(_lat, _lon, gps.getLat(), gps.getLon());
 }
 
 void NavHandler::reset(){
     _reset=true;
     _path_distance=0;
-    _gps.stop();
+    gps.stop();
     //_sdCard.changeFile();
 }
 
@@ -72,9 +74,12 @@ void NavHandler::setMod(int mod) {
     }
 }
 
-void NavHandler::render() {
+void NavHandler::render(LCDhandler & lcd) {
+  
+    gps.refreshData(lcd);
+  
     // Do navigation-related work here
-    if (_gps.isRunning()){
+    if (gps.isRunning()){
       
       unsigned long _diff = difference();
 
@@ -88,8 +93,8 @@ void NavHandler::render() {
             _speedTimer=millis();
           }
       
-          _lat = _gps.getLat();
-          _lon = _gps.getLon();
+          _lat = gps.getLat();
+          _lon = gps.getLon();
           
           if (_reset){
               _start_lat=_lat;
@@ -105,7 +110,7 @@ void NavHandler::render() {
 
 int NavHandler::sdWrite() {
   return 0;
-   // return _sdCard.writeCoordinates (_gps.getLat(), _gps.getLon(), _gps.getDate(), _gps.getTime(), _gps.getSpeed());
+   // return _sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(), gps.getTime(), gps.getSpeed());
 }
 
 // Distance between two given points

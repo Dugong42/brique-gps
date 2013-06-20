@@ -42,9 +42,8 @@ char* MSG_MODS[3]={"Temps","Distance","Combo"};
 
 // Init external components
 LCDhandler lcd;
-GPShandler gps;
 //SDhandler sdCard;
-NavHandler nav(gps);
+NavHandler nav;
 
 // Declaration of used variables
 unsigned long timer;
@@ -116,8 +115,8 @@ void printInfos() {
 
         case 1 :
             // Show Lat/Long
-            lcd.tprint(gps.getLat(), 0);
-            lcd.tprint(gps.getLon(), 1);
+            lcd.tprint(nav.gps.getLat(), 0);
+            lcd.tprint(nav.gps.getLon(), 1);
             break;
 
         case 2 :
@@ -130,8 +129,8 @@ void printInfos() {
         case 3 :
             // Show info
             // TODO put this in a GPShandler method
-            lcd.tprint(gps.getFailed(),0);
-            lcd.tprint(gps.getSentences(),1);
+            lcd.tprint(nav.gps.getFailed(),0);
+            lcd.tprint(nav.gps.getSentences(),1);
             break;
 
         case 4 :
@@ -142,8 +141,8 @@ void printInfos() {
 
         case 5 :
             // Show Date
-            lcd.tprint(gps.getDate(),0);
-            lcd.tprint(gps.getTime(),1);
+            lcd.tprint(nav.gps.getDate(),0);
+            lcd.tprint(nav.gps.getTime(),1);
             break;
 
         default :
@@ -174,8 +173,8 @@ void handleButtons() {
                     //sdCard.changeFile();
 
                 } else {
-                    gps.toggle();
-                    gps.isRunning() ? lcd.notify("Running") : lcd.notify("Paused");
+                    nav.gps.toggle();
+                    nav.gps.isRunning() ? lcd.notify("Running") : lcd.notify("Paused");
                 }
                 while (demuxButtons() == 1);
                 break;
@@ -215,8 +214,7 @@ void handleButtons() {
 void loop() {
     handleButtons();
     printInfos();
-    gps.refreshData(lcd);
-    nav.render();
+    nav.render(lcd);
 
     // Estimate the time spent for CYCLE_NUMBER loops
     meanTick=(meanTick+1)%CYCLE_NUMBER;

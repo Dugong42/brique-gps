@@ -6,7 +6,6 @@
 class NavHandler {
     private:
         //SDhandler _sdCard;
-        GPShandler _gps;
 
         bool _reset;
         int _mod,_write_delay,_write_range;
@@ -23,14 +22,16 @@ class NavHandler {
 
 
     public:
-        NavHandler(GPShandler &);
+        NavHandler();
+        
+        GPShandler gps;        
         
         void reset();
-
+        
         unsigned long getSpeed();
         unsigned long getAbsoluteDistance();
         unsigned long getRouteDistance();
         void setMod(int mod);
-        void render();
+        void render(LCDhandler &);
 };
 #endif
