@@ -5,6 +5,8 @@
 NavHandler::NavHandler(GPShandler & gps) :
   _sdCard(SDhandler())
 {
+    _speed=0;
+    _path_distance=0;
     _reset=true;
     _start_lat=0;
     _start_lon=0;
@@ -28,14 +30,16 @@ const float RAD_CONV = pi/180;
 const float PRECISION = 1e-6f;
 
 unsigned long NavHandler::getAbsoluteDistance() {
-    return distance_between(_start_lat, _start_lon, _lat, _lon);
+    return distance_between(_start_lat, _start_lon, _gps.getLat(), _gps.getLon());
 }
-unsigned long NavHandler::getRouteDistance() {}
+unsigned long NavHandler::getRouteDistance() { return _path_distance; }
 
 // Distance between the current location and the previous recorded
 unsigned long NavHandler::difference() {
-    return distance_between(_lat_p, _lon_p, _lat, _lon);
+    return distance_between(_lat, _lon, _gps.getLat(), _gps.getLon());
 }
+
+unsigned long NavHandler::getSpeed(){ return _speed; }
 
 // Distance between two given points
 unsigned long NavHandler::distance_between(long lat1, long lon1, long lat2, long lon2){
@@ -87,16 +91,18 @@ void NavHandler::setMod(int mod) { _mod=mod; }
 
 void NavHandler::render() {
     // Do navigation-related work here
-    if ( difference()>=1000 && millis()-_writeTimer >= WRITE_DELAY) {
+    unsigned long _diff = difference();
+    if ( _diff>=1000 && millis()-_writeTimer >= WRITE_DELAY) {
         sdWrite();
-        _lat_p = _lat;
-        _lon_p = _lon;
         _lat = _gps.getLat();
         _lon = _gps.getLon();
+        _speed = _diff/(millis()-_writeTimer);
         if (_reset){
             _start_lat=_lat;
             _start_lon=_lon;
             _reset = false;
+        }else{ //Avoids recording the first shift
+            _path_distance+=_diff;
         }
         _writeTimer=millis();
     }

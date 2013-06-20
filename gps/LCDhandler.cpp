@@ -38,12 +38,6 @@ void LCDhandler::checkAvailable() {
 }
 
 // PROCEDURE
-// Clear the screen
-void LCDhandler::cls() {
-    _lcd.clear();
-}
-
-// PROCEDURE
 // Clear a line
 void LCDhandler::cls(int line) {
     _lcd.setCursor(0, line);
@@ -78,8 +72,8 @@ void LCDhandler::printline(char* s, int line) {
 // Notify user with for a while
 // ERR, INFO, WARN
 void LCDhandler::notify(char* s, char* type) {
-    cls();
-    _lcd.print(strcat(strcat("[",type),"]"));
+    _lcd.clear();
+    _lcd.print(type);
     _lcd.setCursor(0, 1);
     _lcd.print(s);
 

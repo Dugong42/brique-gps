@@ -77,7 +77,8 @@ void setup() {
     voltage = analogRead(VOLTPIN);
     //Affiche en pourcentage si je me rapelle de ma règle de 3
 
-    char* batteryLvl = strcat((char*)(voltage*3300/1023),"mV");
+    char* batteryLvl;
+    sprintf(batteryLvl, "%d mv", voltage*3300/1023);
     
     // init serial connexion
     //ss.begin(9600);
@@ -112,55 +113,75 @@ int demuxButtons() {
     return status;
 }
 
+char* ulToChar(unsigned long nb){
+    char* ch; 
+    sprintf(ch,"%lu",nb);
+    return ch;
+}
+
+char* lToChar( long nb){
+    char* ch; 
+    sprintf(ch,"%ld",nb);
+    return ch;
+}
+
+char* usToChar( unsigned short nb){
+    char* ch; 
+    sprintf(ch,"%hu",nb);
+    return ch;
+}
+
 // FUNCTION
 // Print various information
 // Latitude, Longitude, Date, Speed, etc.
 void printInfos() {
+    
+  
     switch (affichage) {
         case 0 :
             // Straight distance
-            lcd.printline("?????? m", 0);
+            lcd.printline(ulToChar(nav.getAbsoluteDistance()), 0);
 
             // Path distance
-            lcd.printline("?????? m", 1);
+            lcd.printline(ulToChar(nav.getRouteDistance()), 1);
             break;
 
         case 1 :
             // Show Lat/Long
-            lcd.printline((char*)(gps.getLat()), 0);
-            lcd.printline((char*)(gps.getLon()), 1);
+            lcd.printline(lToChar(gps.getLat()), 0);
+            lcd.printline(lToChar(gps.getLon()), 1);
             break;
 
         case 2 :
             // Show Speed
             // TODO print unit
-            lcd.printline((char*)(gps.getSpeed()),0);
-            lcd.printline((char*)("cm/s"), 1);
+            lcd.printline(ulToChar(nav.getSpeed()),0);
+            lcd.printline("cm/s", 1);
             break;
 
         case 3 :
             // Show info
             // TODO put this in a GPShandler method
-            lcd.printline((char*)gps.getFailed(),0);
-            lcd.printline((char*)gps.getSentences(),1);
+            lcd.printline(usToChar(gps.getFailed()),0);
+            lcd.printline(usToChar(gps.getSentences()),1);
             break;
 
         case 4 :
             // Show Stat
             lcd.printline("Average",0);
-            lcd.printline(strcat((char*)((curTimer-prevTimer)/CYCLE_NUMBER)," ms"),1);
+            lcd.printline(ulToChar((curTimer-prevTimer)/CYCLE_NUMBER),1);
             break;
 
         case 5 :
             // Show Date
-            lcd.printline((char*)(gps.getDate()),0);
-            lcd.printline((char*)(gps.getTime()),1);
+            lcd.printline(usToChar(gps.getDate()),0);
+            lcd.printline(usToChar(gps.getTime()),1);
             break;
 
         default :
             // Error
-            lcd.printline((char*)("Undef"),0);
-            lcd.printline((char*)("Text"),1);
+            lcd.printline("Undef",0);
+            lcd.printline("Text",1);
     }
 }
 
