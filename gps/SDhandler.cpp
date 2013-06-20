@@ -8,8 +8,7 @@
 #include "SDhandler.h"
 
 //Constructor
-SDhandler::SDhandler() {
-    _nameFile[NAMESIZE];
+SDhandler::SDhandler() {;
 }
 
 void SDhandler::init() {
