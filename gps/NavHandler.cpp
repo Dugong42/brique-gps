@@ -6,6 +6,7 @@ NavHandler::NavHandler() :
     _sdCard(SDhandler()),
     gps(GPShandler())
 {
+    _write_delay=1000;
     _write_space=5;
     _speed=0;
     _path_distance=0;
@@ -28,16 +29,20 @@ const float a = 6378137;
 const float b = 6356752.314245;
 const float f = 1/(298.257223563);
 
-const float pi = 3.1415926;
+const float pi = 3.141593;
 const float RAD_CONV = pi/180;
 const float PRECISION = 1e-6f;
 
-int write_delay, write_range;
+// Getters and setters
 
 unsigned long NavHandler::getAbsoluteDistance() {
     return distance_between(_start_lat, _start_lon, gps.getLat(), gps.getLon());
 }
 unsigned long NavHandler::getRouteDistance() { return _path_distance; }
+
+unsigned long NavHandler::getSpeed(){ return _speed; }
+
+void NavHandler::setMod(int mod) { _write_space=mod; }
 
 void NavHandler::reset(){
     _reset=true;
@@ -48,11 +53,7 @@ void NavHandler::reset(){
     _sdCard.changeFile();
 }
 
-unsigned long NavHandler::getSpeed(){ return _speed; }
-
-void NavHandler::setMod(int mod) {
-    _write_space=mod;
-}
+// Other functions
 
 void NavHandler::render(LCDhandler & lcd) {
 
@@ -65,7 +66,7 @@ void NavHandler::render(LCDhandler & lcd) {
         unsigned long _speed_diff = distance_between(_speed_lat, _speed_lon, lat, lon);
         unsigned long _rec_diff = distance_between(_rec_lat, _rec_lon, lat, lon);
 
-        if ( _rec_diff>=_write_space && millis()-_writeTimer >= write_delay) {
+        if ( _rec_diff>=_write_space*1000 && millis()-_writeTimer >= _write_delay) {
             _rec_lat = lat;
             _rec_lon = lon;
 
@@ -98,9 +99,9 @@ unsigned long NavHandler::distance_between(long lat1, long lon1, long lat2, long
     // Vincenty formula calculates the distance between two points on an ellipsoid
 
     int iteration=0;
-    float U1 = atan((1 - f)*tan(lat1*RAD_CONV));
-    float U2 = atan((1 - f)*tan(lat2*RAD_CONV));
-    float L = abs(lon2-lon1)*RAD_CONV;
+    float U1 = atan((1 - f)*tan(lat1*RAD_CONV*1e-5));
+    float U2 = atan((1 - f)*tan(lat2*RAD_CONV*1e-5));
+    float L = (lon2-lon1)*RAD_CONV*1e-5;
     float sinU1=sin(U1), cosU1=cos(U1), sinU2=sin(U2), cosU2=cos(U2);
 
     float lambda = L, lambdaP;
@@ -116,15 +117,15 @@ unsigned long NavHandler::distance_between(long lat1, long lon1, long lat2, long
         sigma = atan2(sinSigma, cosSigma);
         sinAlpha = cosU1 * cosU2 * sinLambda / sinSigma;
         cosSqAlpha = 1 - sinAlpha*sinAlpha;
-        cos2SigmaM = cosSigma - 2*sinU1*sinU2/cosSqAlpha;
 
-        //if (isNaN(cos2SigmaM)) cos2SigmaM = 0;  // equatorial line: cosSqAlpha=0
+        if (cosSqAlpha==0) { cos2SigmaM = 0; } // equatorial line: cosSqAlpha=0
+        else{ cos2SigmaM = cosSigma - 2*sinU1*sinU2/cosSqAlpha; }
 
         C = f/16*cosSqAlpha*(4+f*(4-3*cosSqAlpha));
         lambdaP = lambda;
         lambda = L + (1-C) * f * sinAlpha *
             (sigma + C*sinSigma*(cos2SigmaM+C*cosSigma*(-1+2*cos2SigmaM*cos2SigmaM)));
-    }while(abs(lambda-lambdaP)>PRECISION && ++iteration<100);
+    } while(abs(lambda-lambdaP)>PRECISION && ++iteration<100);
 
     if (iteration==0) return 0;  // formula failed to converge
 
@@ -135,5 +136,5 @@ unsigned long NavHandler::distance_between(long lat1, long lon1, long lat2, long
                 B/6*cos2SigmaM*(-3+4*sinSigma*sinSigma)*(-3+4*cos2SigmaM*cos2SigmaM)));
     float s = b*A*(sigma-deltaSigma);
 
-    return (unsigned long)s; //returns distance in mm
+    return (unsigned long)s*100; //returns distance in cm
 }
