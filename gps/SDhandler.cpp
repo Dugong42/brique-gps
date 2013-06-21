@@ -61,7 +61,7 @@ void SDhandler::changeFile() {
     File logFile = SD.open(_nameFile, FILE_WRITE);
     if (logFile) {
         logFile.println("");
-        logFile.println("latitude;longitude;date;time;speed;distance;");
+        logFile.println("latitude;longitude;datetime");
         logFile.close();
     }
 }

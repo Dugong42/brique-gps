@@ -76,7 +76,7 @@ void NavHandler::render(LCDhandler & lcd) {
 
       // Enregistrement de coordonnées
 
-      if ( _rec_diff>=_write_space*PRECISION || millis()-_writeTimer >= _write_delay) {
+      if ( _rec_diff>=_write_space*PRECISION && millis()-_writeTimer >= _write_delay) {
           _rec_lat = lat;
           _rec_lon = lon;
 
