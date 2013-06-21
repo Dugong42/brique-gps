@@ -33,13 +33,13 @@ void SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
         unsigned long time, unsigned long speed, unsigned long dist) {
     File logFile = SD.open(_nameFile, FILE_WRITE);
     if (logFile) {
-        float flat;
-        float flon;
-        flat=((float) lat)/1e5;
-        flon=((float) lon)/1e5;
-        logFile.print(flat);
+        float flat=lat;
+        float flon=lon;
+        flat=flat*1e-5;
+        flon=flon*1e-5;
+        logFile.print(flat,5);
         logFile.print(";");
-        logFile.print(flon);
+        logFile.print(flon,5);
         logFile.print(";");
         logFile.print(date);
     //    logFile.print(";");
