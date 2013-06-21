@@ -47,3 +47,5 @@ Changer de fonction d'acquisition temps/distance
 #### Bouton 4 :
 
 Envoyer sur le PC
+
+![Capture projet KML](https://raw.github.com/Dugong42/brique-gps/master/%5BIF23%5D.Capture2.png)
