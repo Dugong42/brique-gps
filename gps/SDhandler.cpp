@@ -14,13 +14,6 @@ SDhandler::SDhandler() {;
 void SDhandler::init() {
     strcpy(_nameFile, "GPS.TXT");
     SD.begin(CS);
-
-    File logFile = SD.open(_nameFile, FILE_WRITE);
-    if (logFile) {
-        logFile.println("latitude;longitude;date;time;speed;");
-        logFile.close();
-    }
-
 }
 
 /**
@@ -37,15 +30,25 @@ void SDhandler::init() {
  *	   -2 si erreur ecriture
  */
 void SDhandler::writeCoordinates (long lat, long lon, unsigned long date,
-        unsigned long time, unsigned long gspeed)
-{
-    char logEntry[LOGENTRY_SIZE];
+        unsigned long time, unsigned long speed, unsigned long dist) {
     File logFile = SD.open(_nameFile, FILE_WRITE);
-
-    sprintf(logEntry, "%f;%f;%f;%f;%f;", lat, lon, gspeed, date, time);
-
     if (logFile) {
-        logFile.println(logEntry);
+        float flat;
+        float flon;
+        flat=((float) lat)/1e5;
+        flon=((float) lon)/1e5;
+        logFile.print(flat);
+        logFile.print(";");
+        logFile.print(flon);
+        logFile.print(";");
+        logFile.print(date);
+    //    logFile.print(";");
+        logFile.println(time);
+        // logFile.print(";");
+        //logFile.print(speed);
+        //logFile.print(";");
+        //logFile.print(dist);
+        //logFile.println(";");
         logFile.close();
     }
 }
@@ -58,7 +61,7 @@ void SDhandler::changeFile() {
     File logFile = SD.open(_nameFile, FILE_WRITE);
     if (logFile) {
         logFile.println("");
-        logFile.println("latitude;longitude;date;time;speed;");
+        logFile.println("latitude;longitude;date;time;speed;distance;");
         logFile.close();
     }
 }
@@ -70,12 +73,12 @@ void SDhandler::dumpFile(LCDhandler & lcd) {
     // so you have to close this one before opening another.
     File logFile = SD.open(_nameFile, FILE_READ);
     // if the file is available, write to it:
-    if (logFile && Serial.available()) {
+    if (logFile) {
         while (logFile.available()) {
             lcd.printline("Reading", 0);
             lcd.printline(_nameFile, 1);
             Serial.begin(9600);
-            Serial.println(logFile.read());
+            Serial.write(logFile.read());
         }
 
         logFile.close();

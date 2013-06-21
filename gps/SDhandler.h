@@ -20,8 +20,8 @@ class SDhandler {
     public :
         SDhandler();
         void init();
-        void writeCoordinates (long lat, long lon, unsigned long date,
-                unsigned long time, unsigned long gspeed);
+        void writeCoordinates (long , long , unsigned long ,
+                unsigned long , unsigned long , unsigned long);
         void changeFile();
         void dumpFile(LCDhandler &);
 };

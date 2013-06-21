@@ -190,7 +190,7 @@ void handleButtons() {
 
             case 4:
                 // TODO PC Transfert
-                lcd.notify("USB SYNC");
+//                lcd.notify("USB SYNC");
                 nav.initUSBSync(lcd);
                 break;
 

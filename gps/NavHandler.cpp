@@ -34,7 +34,7 @@ const float pi = 3.1415926;
 const float RAD_CONV = pi/180;
 const float LIMIT = 1e-9f;
 
-const int PRECISION = 1000; // The distance is rounded to 1m*PRECISION
+const int PRECISION = 100; // The distance is rounded to 1m*PRECISION
 
 // Getters and setters
 
@@ -76,7 +76,7 @@ void NavHandler::render(LCDhandler & lcd) {
 
       // Enregistrement de coordonnées
 
-      if ( _rec_diff>=_write_space*PRECISION && millis()-_writeTimer >= _write_delay) {
+      if ( _rec_diff>=_write_space*PRECISION || millis()-_writeTimer >= _write_delay) {
           _rec_lat = lat;
           _rec_lon = lon;
 
@@ -104,7 +104,8 @@ void NavHandler::render(LCDhandler & lcd) {
 
 void NavHandler::sdWrite() {
     //return 0;
-    sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(), gps.getTime(), gps.getSpeed());
+    sdCard.writeCoordinates (gps.getLat(), gps.getLon(), gps.getDate(),
+                gps.getTime(), _speed, _path_distance);
 }
 
 // Distance between two given points
@@ -115,11 +116,13 @@ unsigned long NavHandler::distance_between(long lat1, long lon1, long lat2, long
     int iteration=0;
     float U1 = atan((1 - f)*tan(lat1*RAD_CONV*1e-5));
     float U2 = atan((1 - f)*tan(lat2*RAD_CONV*1e-5));
-    float L = (lon2-lon1)*RAD_CONV*1e-5;
+    float L = abs(lon2-lon1)*RAD_CONV*1e-5;
     float sinU1=sin(U1), cosU1=cos(U1), sinU2=sin(U2), cosU2=cos(U2);
 
     float lambda = L, lambdaP;
-    float sinLambda,cosLambda,sinSigma,cosSigma,sigma,sinAlpha,cosSqAlpha,cos2SigmaM,C;
+    float sinLambda, cosLambda, sinSigma,
+          cosSigma, sigma, sinAlpha,
+          cosSqAlpha, cos2SigmaM, C;
     do{
         sinLambda = sin(lambda), cosLambda = cos(lambda);
         sinSigma = sqrt((cosU2*sinLambda) * (cosU2*sinLambda) +
